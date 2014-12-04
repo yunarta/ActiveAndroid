@@ -1,15 +1,15 @@
 package com.activeandroid.test;
 
+import java.util.Collection;
+
 import android.test.AndroidTestCase;
 
-import com.activeandroid.ActiveAndroid;
-import com.activeandroid.Cache;
-import com.activeandroid.Configuration;
-import com.activeandroid.Model;
-import com.activeandroid.TableInfo;
-import com.activeandroid.annotation.Table;
-
-import java.util.Collection;
+import com.activeandroid.sebbia.ActiveAndroid;
+import com.activeandroid.sebbia.Cache;
+import com.activeandroid.sebbia.Configuration;
+import com.activeandroid.sebbia.Model;
+import com.activeandroid.sebbia.TableInfo;
+import com.activeandroid.sebbia.annotation.Table;
 
 public class CacheTest extends AndroidTestCase {
 

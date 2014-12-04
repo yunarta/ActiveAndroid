@@ -16,8 +16,8 @@ package com.activeandroid.test.query;
  * limitations under the License.
  */
 
-import com.activeandroid.query.Set;
-import com.activeandroid.query.Update;
+import com.activeandroid.sebbia.query.Set;
+import com.activeandroid.sebbia.query.Update;
 import com.activeandroid.test.MockModel;
 
 public class UpdateTest extends SqlableTestCase {

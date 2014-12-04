@@ -4,8 +4,8 @@ package com.activeandroid.test.parser;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.activeandroid.Configuration;
-import com.activeandroid.DatabaseHelper;
+import com.activeandroid.sebbia.Configuration;
+import com.activeandroid.sebbia.DatabaseHelper;
 import com.activeandroid.test.ActiveAndroidTestCase;
 
 

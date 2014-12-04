@@ -16,10 +16,10 @@ package com.activeandroid.test.query;
  * limitations under the License.
  */
 
-import com.activeandroid.Model;
-import com.activeandroid.annotation.Table;
-import com.activeandroid.query.From;
-import com.activeandroid.query.Select;
+import com.activeandroid.sebbia.Model;
+import com.activeandroid.sebbia.annotation.Table;
+import com.activeandroid.sebbia.query.From;
+import com.activeandroid.sebbia.query.Select;
 import com.activeandroid.test.MockModel;
 
 public class FromTest extends SqlableTestCase {

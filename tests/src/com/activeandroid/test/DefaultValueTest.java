@@ -5,12 +5,12 @@ import java.util.List;
 import android.app.Application;
 import android.test.ApplicationTestCase;
 
-import com.activeandroid.ActiveAndroid;
-import com.activeandroid.Configuration;
-import com.activeandroid.Model;
-import com.activeandroid.annotation.Column;
-import com.activeandroid.annotation.Table;
-import com.activeandroid.query.Select;
+import com.activeandroid.sebbia.ActiveAndroid;
+import com.activeandroid.sebbia.Configuration;
+import com.activeandroid.sebbia.Model;
+import com.activeandroid.sebbia.annotation.Column;
+import com.activeandroid.sebbia.annotation.Table;
+import com.activeandroid.sebbia.query.Select;
 
 public class DefaultValueTest extends ApplicationTestCase<Application> {
 	

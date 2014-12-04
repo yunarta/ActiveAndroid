@@ -16,11 +16,11 @@ package com.activeandroid.test;
  * limitations under the License.
  */
 
-import com.activeandroid.Model;
-import com.activeandroid.annotation.Column;
-import com.activeandroid.annotation.Table;
-
 import java.util.Date;
+
+import com.activeandroid.sebbia.Model;
+import com.activeandroid.sebbia.annotation.Column;
+import com.activeandroid.sebbia.annotation.Table;
 
 @Table(name = "MockModel")
 public class MockModel extends Model {

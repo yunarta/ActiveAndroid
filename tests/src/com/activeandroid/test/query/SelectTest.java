@@ -16,7 +16,7 @@ package com.activeandroid.test.query;
  * limitations under the License.
  */
 
-import com.activeandroid.query.Select;
+import com.activeandroid.sebbia.query.Select;
 import com.activeandroid.test.MockModel;
 
 public class SelectTest extends SqlableTestCase {

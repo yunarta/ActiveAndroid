@@ -3,8 +3,8 @@ package com.activeandroid.test.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.activeandroid.Model;
-import com.activeandroid.model.OneToManyRelation;
+import com.activeandroid.sebbia.Model;
+import com.activeandroid.sebbia.model.OneToManyRelation;
 import com.activeandroid.test.MockModel;
 
 public class OneToManyTest extends ModelTestCase {

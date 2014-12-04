@@ -3,8 +3,8 @@ package com.activeandroid.test.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.activeandroid.Model;
-import com.activeandroid.model.ManyToManyRelation;
+import com.activeandroid.sebbia.Model;
+import com.activeandroid.sebbia.model.ManyToManyRelation;
 import com.activeandroid.test.MockModel;
 
 public class ManyToManyTest extends ModelTestCase {

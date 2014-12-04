@@ -4,11 +4,11 @@ import java.util.List;
 
 import android.database.Cursor;
 
-import com.activeandroid.ActiveAndroid;
-import com.activeandroid.Model;
-import com.activeandroid.annotation.Column;
-import com.activeandroid.annotation.Table;
-import com.activeandroid.query.Select;
+import com.activeandroid.sebbia.ActiveAndroid;
+import com.activeandroid.sebbia.Model;
+import com.activeandroid.sebbia.annotation.Column;
+import com.activeandroid.sebbia.annotation.Table;
+import com.activeandroid.sebbia.query.Select;
 
 public class AddColumnsTest extends AutoMigrationTest {
 	

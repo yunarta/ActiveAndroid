@@ -1,13 +1,13 @@
 
 package com.activeandroid.test.parser;
 
-import com.activeandroid.test.ActiveAndroidTestCase;
-import com.activeandroid.test.R;
-import com.activeandroid.util.SqlParser;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+
+import com.activeandroid.sebbia.util.SqlParser;
+import com.activeandroid.test.ActiveAndroidTestCase;
+import com.activeandroid.test.R;
 
 
 public class ParserTest extends ActiveAndroidTestCase {

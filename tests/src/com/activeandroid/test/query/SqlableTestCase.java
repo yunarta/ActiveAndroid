@@ -16,7 +16,7 @@ package com.activeandroid.test.query;
  * limitations under the License.
  */
 
-import com.activeandroid.query.Sqlable;
+import com.activeandroid.sebbia.query.Sqlable;
 import com.activeandroid.test.ActiveAndroidTestCase;
 
 public abstract class SqlableTestCase extends ActiveAndroidTestCase {

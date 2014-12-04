@@ -1,13 +1,13 @@
 package com.activeandroid.test;
 
-import com.activeandroid.Configuration;
-import com.activeandroid.Model;
-import com.activeandroid.annotation.Table;
+import java.io.IOException;
+import java.util.List;
 
 import android.test.AndroidTestCase;
 
-import java.io.IOException;
-import java.util.List;
+import com.activeandroid.sebbia.Configuration;
+import com.activeandroid.sebbia.Model;
+import com.activeandroid.sebbia.annotation.Table;
 
 public class ConfigurationTest extends AndroidTestCase {
 

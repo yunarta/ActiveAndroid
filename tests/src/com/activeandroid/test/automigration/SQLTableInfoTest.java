@@ -1,9 +1,9 @@
 package com.activeandroid.test.automigration;
 
-import com.activeandroid.automigration.SQLColumnInfo;
-import com.activeandroid.automigration.SQLTableInfo;
+import com.activeandroid.sebbia.automigration.SQLColumnInfo;
+import com.activeandroid.sebbia.automigration.SQLTableInfo;
+import com.activeandroid.sebbia.util.SQLiteUtils.SQLiteType;
 import com.activeandroid.test.ActiveAndroidTestCase;
-import com.activeandroid.util.SQLiteUtils.SQLiteType;
 
 public class SQLTableInfoTest extends ActiveAndroidTestCase {
 	

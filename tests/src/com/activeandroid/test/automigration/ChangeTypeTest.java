@@ -1,10 +1,9 @@
 package com.activeandroid.test.automigration;
 
-import com.activeandroid.ActiveAndroid;
-import com.activeandroid.Model;
-import com.activeandroid.annotation.Column;
-import com.activeandroid.annotation.Table;
-import com.activeandroid.automigration.AutoMigration;
+import com.activeandroid.sebbia.Model;
+import com.activeandroid.sebbia.annotation.Column;
+import com.activeandroid.sebbia.annotation.Table;
+import com.activeandroid.sebbia.automigration.AutoMigration;
 
 public class ChangeTypeTest extends AutoMigrationTest {
 	

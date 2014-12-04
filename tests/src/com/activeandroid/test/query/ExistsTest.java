@@ -1,12 +1,12 @@
 
 package com.activeandroid.test.query;
 
-import com.activeandroid.query.Delete;
-import com.activeandroid.query.From;
-import com.activeandroid.query.Select;
-import com.activeandroid.test.MockModel;
-
 import java.util.List;
+
+import com.activeandroid.sebbia.query.Delete;
+import com.activeandroid.sebbia.query.From;
+import com.activeandroid.sebbia.query.Select;
+import com.activeandroid.test.MockModel;
 
 
 public class ExistsTest extends SqlableTestCase {

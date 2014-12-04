@@ -16,7 +16,7 @@ package com.activeandroid.test.query;
  * limitations under the License.
  */
 
-import com.activeandroid.query.Delete;
+import com.activeandroid.sebbia.query.Delete;
 import com.activeandroid.test.MockModel;
 
 public class DeleteTest extends SqlableTestCase {

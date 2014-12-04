@@ -1,6 +1,6 @@
 package com.activeandroid.test.automigration;
 
-import com.activeandroid.automigration.SQLColumnInfo;
+import com.activeandroid.sebbia.automigration.SQLColumnInfo;
 import com.activeandroid.test.ActiveAndroidTestCase;
 
 public class SQLColumnInfoTest extends ActiveAndroidTestCase {

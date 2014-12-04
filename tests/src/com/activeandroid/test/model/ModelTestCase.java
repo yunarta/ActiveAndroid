@@ -1,7 +1,7 @@
 package com.activeandroid.test.model;
 
-import com.activeandroid.ActiveAndroid;
-import com.activeandroid.Configuration;
+import com.activeandroid.sebbia.ActiveAndroid;
+import com.activeandroid.sebbia.Configuration;
 import com.activeandroid.test.ActiveAndroidTestCase;
 
 public class ModelTestCase extends ActiveAndroidTestCase {
