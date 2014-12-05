@@ -22,9 +22,9 @@ public class EmptyModelFiller extends ModelFiller {
 			superModelFiller.fillContentValues(model, contentValues);
 	}
 
-	@Override
-	public void bindStatement(Model model, SQLiteStatement statement, Map<String, Integer> columns) {
-		if (superModelFiller != null)
-			superModelFiller.bindStatement(model, statement, columns);
-	}
+//	@Override
+//	public void bindStatement(Model model, SQLiteStatement statement, Map<String, Integer> columns) {
+//		if (superModelFiller != null)
+//			superModelFiller.bindStatement(model, statement, columns);
+//	}
 }

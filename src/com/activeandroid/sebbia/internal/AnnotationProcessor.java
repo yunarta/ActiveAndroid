@@ -129,12 +129,12 @@ public final class AnnotationProcessor extends AbstractProcessor {
 			writer.write(getFillContentValuesCode(columns));
 			writer.write("  }\n");
 			
-			writer.write("  public void bindStatement(com.activeandroid.sebbia.Model genericModel, SQLiteStatement " + STATEMENT + ", Map<String, Integer> " + COLUMNS + ") {\n");
-			writer.write("    if (superModelFiller != null)\n");
-			writer.write("       superModelFiller.bindStatement(genericModel, " + STATEMENT + ", " + COLUMNS + ");\n");
-			writer.write("    " + className + " " + MODEL + " = (" + className + ") genericModel;\n");
-			writer.write(getBindStatementCode(columns));
-			writer.write("  }\n");
+//			writer.write("  public void bindStatement(com.activeandroid.sebbia.Model genericModel, SQLiteStatement " + STATEMENT + ", Map<String, Integer> " + COLUMNS + ") {\n");
+//			writer.write("    if (superModelFiller != null)\n");
+//			writer.write("       superModelFiller.bindStatement(genericModel, " + STATEMENT + ", " + COLUMNS + ");\n");
+//			writer.write("    " + className + " " + MODEL + " = (" + className + ") genericModel;\n");
+//			writer.write(getBindStatementCode(columns));
+//			writer.write("  }\n");
 
 			writer.write("}");
 			writer.flush();
@@ -182,6 +182,7 @@ public final class AnnotationProcessor extends AbstractProcessor {
 			else if (isTypeOf(typeMirror, Byte[].class) || isTypeOf(typeMirror, byte[].class))
 				stringBuilder.append(setValue + ".getBlob(" + getColumnIndex + ");\n");
 			else {
+				processingEnv.getMessager().printMessage(Kind.NOTE, "Guessing what type is at " + typeMirror.toString(), null);
 				stringBuilder.append("    if (ModelHelper.isSerializable(" + type + ")) {\n");
 				stringBuilder.append("      " + MODEL + "." + column.getSimpleName() + " = (" + typeMirror.toString() + ") ModelHelper.getSerializable(cursor, " + type + ", " + getColumnIndex + ");\n");
 				stringBuilder.append("    } else {\n");
@@ -337,7 +338,7 @@ public final class AnnotationProcessor extends AbstractProcessor {
 	}
 
 	private boolean isTypeOf(TypeMirror typeMirror, Class<?> type) {
-		if (type.getName().equals(typeMirror.toString()))
+		if (type.getCanonicalName().equals(typeMirror.toString()))
 			return true;
 
 		if (typeMirror instanceof DeclaredType == false)
