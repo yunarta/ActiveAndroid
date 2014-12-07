@@ -24,6 +24,7 @@ import java.util.List;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 
 import com.activeandroid.sebbia.content.ContentProvider;
 import com.activeandroid.sebbia.internal.ModelFiller;
@@ -109,10 +110,17 @@ public abstract class Model {
 		final ContentValues values = new ContentValues();
 		for (Model entity : entities) {
 			values.clear();
-			fillContentValues(entity, values);
-			if (entity.mId == null) {
-				entity.mId = db.insertWithOnConflict(entity.mTableInfo.getTableName(), null, values, SQLiteDatabase.CONFLICT_REPLACE);
+			if (entity.mId == null && (entity instanceof ManyToManyRelation<?, ?> || entity instanceof OneToManyRelation<?>)) {
+				entity.fillContentValuesReflective(values);
+				db.insert(entity.mTableInfo.getTableName(), null, values);
+			} else if (entity.mId == null) {
+				ModelFiller filler = Cache.getFiller(entity.getClass());
+				SQLiteStatement statement = entity.mTableInfo.getInsertOrReplaceStatement();
+				statement.clearBindings();
+				filler.bindStatement(entity, statement, entity.mTableInfo.getColumnIndexes());
+				entity.mId = statement.executeInsert();
 			} else {
+				fillContentValues(entity, values);
 				db.update(entity.mTableInfo.getTableName(), values, "Id=" + entity.mId, null);
 			}
 		}

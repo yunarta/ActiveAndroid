@@ -129,12 +129,12 @@ public final class AnnotationProcessor extends AbstractProcessor {
 			writer.write(getFillContentValuesCode(columns));
 			writer.write("  }\n");
 			
-//			writer.write("  public void bindStatement(com.activeandroid.sebbia.Model genericModel, SQLiteStatement " + STATEMENT + ", Map<String, Integer> " + COLUMNS + ") {\n");
-//			writer.write("    if (superModelFiller != null)\n");
-//			writer.write("       superModelFiller.bindStatement(genericModel, " + STATEMENT + ", " + COLUMNS + ");\n");
-//			writer.write("    " + className + " " + MODEL + " = (" + className + ") genericModel;\n");
-//			writer.write(getBindStatementCode(columns));
-//			writer.write("  }\n");
+			writer.write("  public void bindStatement(com.activeandroid.sebbia.Model genericModel, SQLiteStatement " + STATEMENT + ", Map<String, Integer> " + COLUMNS + ") {\n");
+			writer.write("    if (superModelFiller != null)\n");
+			writer.write("       superModelFiller.bindStatement(genericModel, " + STATEMENT + ", " + COLUMNS + ");\n");
+			writer.write("    " + className + " " + MODEL + " = (" + className + ") genericModel;\n");
+			writer.write(getBindStatementCode(columns));
+			writer.write("  }\n");
 
 			writer.write("}");
 			writer.flush();
