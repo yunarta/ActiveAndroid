@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -156,7 +157,7 @@ public final class AnnotationProcessor extends AbstractProcessor {
 				fieldName = column.getSimpleName().toString();
 
 			TypeMirror typeMirror = column.asType();
-			String type = typeMirror.toString() + ".class";
+			String type = getClassString(typeMirror, typeMirror instanceof DeclaredType);
 			String getColumnIndex = COLUMNS_ORDERED + ".indexOf(\"" + fieldName + "\")";
 
 			String setValue = "    " + MODEL + "." + column.getSimpleName() + " = " + CURSOR;
@@ -213,7 +214,7 @@ public final class AnnotationProcessor extends AbstractProcessor {
 			
 			TypeMirror typeMirror = column.asType();
 			boolean notPrimitiveType = typeMirror instanceof DeclaredType;
-			String type = typeMirror.toString() + ".class";
+			String type = getClassString(typeMirror, notPrimitiveType);
 			String getValue = MODEL + "." + column.getSimpleName();
 			
 			boolean hasDefault = annotation.defaultValue() != null && annotation.defaultValue().isEmpty() == false;
@@ -281,7 +282,8 @@ public final class AnnotationProcessor extends AbstractProcessor {
 			
 			TypeMirror typeMirror = column.asType();
 			boolean notPrimitiveType = typeMirror instanceof DeclaredType;
-			String type = typeMirror.toString() + ".class";
+			String type = getClassString(typeMirror, notPrimitiveType);
+			
 			String getValue = MODEL + "." + column.getSimpleName();
 			
 			String columnIndex = COLUMNS + ".get(\"" + fieldName + "\")"; 
@@ -335,6 +337,17 @@ public final class AnnotationProcessor extends AbstractProcessor {
 				stringBuilder.append("    }\n");
 		}
 		return stringBuilder.toString();
+	}
+
+	private String getClassString(TypeMirror typeMirror, boolean notPrimitiveType) {
+		String type = typeMirror.toString() + ".class";
+		if (notPrimitiveType) {
+			DeclaredType declaredType = (DeclaredType) typeMirror;
+			List<? extends TypeMirror> typeArguments = declaredType.getTypeArguments();
+			if (typeArguments != null && typeArguments.size() > 0)
+				type = ((TypeElement) declaredType.asElement()).getQualifiedName() + ".class";
+		}
+		return type;
 	}
 
 	private boolean isTypeOf(TypeMirror typeMirror, Class<?> type) {
