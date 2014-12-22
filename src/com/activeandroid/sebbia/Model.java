@@ -110,7 +110,7 @@ public abstract class Model {
 		final ContentValues values = new ContentValues();
 		for (Model entity : entities) {
 			values.clear();
-			if (entity.mId == null && (entity instanceof ManyToManyRelation<?, ?> || entity instanceof OneToManyRelation<?>)) {
+			if (entity.mId == null && (entity instanceof ManyToManyRelation<?, ?> || entity instanceof OneToManyRelation<?, ?>)) {
 				entity.fillContentValuesReflective(values);
 				db.insert(entity.mTableInfo.getTableName(), null, values);
 			} else if (entity.mId == null) {
@@ -137,7 +137,7 @@ public abstract class Model {
 	}
 	
 	private static void fillContentValues(Model entity, ContentValues values) {
-		if (entity instanceof ManyToManyRelation<?, ?> || entity instanceof OneToManyRelation<?>) {
+		if (entity instanceof ManyToManyRelation<?, ?> || entity instanceof OneToManyRelation<?, ?>) {
 			entity.fillContentValuesReflective(values);
 			return;
 		}

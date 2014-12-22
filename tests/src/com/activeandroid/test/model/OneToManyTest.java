@@ -9,7 +9,7 @@ import com.activeandroid.test.MockModel;
 
 public class OneToManyTest extends ModelTestCase {
 	
-	public static class MockOneToManyRelation extends OneToManyRelation<MockModel> {
+	public static class MockOneToManyRelation extends OneToManyRelation<MockModel, Model> {
 		public MockOneToManyRelation() {
 			super();
 		}
