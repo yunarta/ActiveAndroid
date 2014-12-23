@@ -23,6 +23,7 @@ import javax.tools.JavaFileObject;
 
 import com.activeandroid.sebbia.Model;
 import com.activeandroid.sebbia.annotation.Column;
+import com.activeandroid.sebbia.annotation.DoNotGenerate;
 
 public final class AnnotationProcessor extends AbstractProcessor {
 
@@ -66,16 +67,18 @@ public final class AnnotationProcessor extends AbstractProcessor {
 			}
 			VariableElement columnElement = (VariableElement) element;
 
-			if (checkColumnModifiers(columnElement) == false)
-				continue;
-
 			TypeElement tableElement = null;
-			if (element.getEnclosingElement() instanceof TypeElement)
+			if (element.getEnclosingElement() instanceof TypeElement) {
 				tableElement = (TypeElement) element.getEnclosingElement();
-			else
+			} else {
 				error("@Column annotation located not inside of class", element);
-
+				continue;
+			}
+				
 			if (checkTableModifiers(tableElement) == false)
+				continue;
+			
+			if (checkColumnModifiers(columnElement) == false)
 				continue;
 
 			Set<VariableElement> columnsElements = tables.get(tableElement);
@@ -379,6 +382,9 @@ public final class AnnotationProcessor extends AbstractProcessor {
 			error("Only classes can be marked with @Table annotation", table);
 			return false;
 		}
+		
+		if (table.getAnnotation(DoNotGenerate.class) != null)
+			return false;
 
 		return true;
 	}

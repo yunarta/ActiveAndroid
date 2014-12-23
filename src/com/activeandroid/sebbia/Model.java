@@ -43,33 +43,34 @@ public abstract class Model {
 	/** Prime number used for hashcode() implementation. */
 	private static final int HASH_PRIME = 739;
 
-	//////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////
 	// PRIVATE MEMBERS
-	//////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////
 
 	private Long mId = null;
 
 	private final TableInfo mTableInfo;
 	private final String idName;
-	//////////////////////////////////////////////////////////////////////////////////////
+
+	// ////////////////////////////////////////////////////////////////////////////////////
 	// CONSTRUCTORS
-	//////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////
 
 	public Model() {
 		mTableInfo = Cache.getTableInfo(getClass());
 		idName = mTableInfo.getIdName();
 	}
 
-	//////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////
 	// PUBLIC METHODS
-	//////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////
 
 	public final Long getId() {
 		return mId;
 	}
 
 	public final void delete() {
-		Cache.openDatabase().delete(mTableInfo.getTableName(), idName+"=?", new String[] { getId().toString() });
+		Cache.openDatabase().delete(mTableInfo.getTableName(), idName + "=?", new String[] { getId().toString() });
 		Cache.removeEntity(this);
 
 		Cache.getContext().getContentResolver()
@@ -85,7 +86,7 @@ public abstract class Model {
 			mId = db.insert(mTableInfo.getTableName(), null, values);
 		}
 		else {
-			db.update(mTableInfo.getTableName(), values, idName+"=" + mId, null);
+			db.update(mTableInfo.getTableName(), values, idName + "=" + mId, null);
 		}
 
 		Cache.getContext().getContentResolver()
@@ -97,58 +98,61 @@ public abstract class Model {
 
 	public static void delete(Class<? extends Model> type, long id) {
 		TableInfo tableInfo = Cache.getTableInfo(type);
-		new Delete().from(type).where(tableInfo.getIdName()+"=?", id).execute();
+		new Delete().from(type).where(tableInfo.getIdName() + "=?", id).execute();
 	}
 
 	public static <T extends Model> T load(Class<T> type, long id) {
 		TableInfo tableInfo = Cache.getTableInfo(type);
-		return (T) new Select().from(type).where(tableInfo.getIdName()+"=?", id).executeSingle();
+		return (T) new Select().from(type).where(tableInfo.getIdName() + "=?", id).executeSingle();
 	}
-	
+
 	public static void saveMultiple(List<? extends Model> entities) {
 		final SQLiteDatabase db = Cache.openDatabase();
 		final ContentValues values = new ContentValues();
 		for (Model entity : entities) {
 			values.clear();
-			if (entity.mId == null && (entity instanceof ManyToManyRelation<?, ?> || entity instanceof OneToManyRelation<?, ?>)) {
-				entity.fillContentValuesReflective(values);
-				db.insert(entity.mTableInfo.getTableName(), null, values);
-			} else if (entity.mId == null) {
+			if (entity.mId == null) {
 				ModelFiller filler = Cache.getFiller(entity.getClass());
-				SQLiteStatement statement = entity.mTableInfo.getInsertOrReplaceStatement();
-				statement.clearBindings();
-				filler.bindStatement(entity, statement, entity.mTableInfo.getColumnIndexes());
-				entity.mId = statement.executeInsert();
+				if (filler != null) {
+					SQLiteStatement statement = entity.mTableInfo.getInsertOrReplaceStatement();
+					statement.clearBindings();
+					filler.bindStatement(entity, statement, entity.mTableInfo.getColumnIndexes());
+					entity.mId = statement.executeInsert();
+				} else {
+					entity.fillContentValuesReflective(values);
+					entity.mId = db.insert(entity.mTableInfo.getTableName(), null, values);
+				}
 			} else {
 				fillContentValues(entity, values);
 				db.update(entity.mTableInfo.getTableName(), values, "Id=" + entity.mId, null);
 			}
 		}
 	}
+
 	// Model population
 
 	public final void loadFromCursor(Cursor cursor) {
 		ModelFiller filler = Cache.getFiller(mTableInfo.getType());
-		if (filler != null) {			
+		if (filler != null) {
 			loadFromCursorWithFiller(cursor, filler);
 		} else {
 			loadFromCursorReflective(cursor);
 		}
 	}
-	
+
 	private static void fillContentValues(Model entity, ContentValues values) {
 		if (entity instanceof ManyToManyRelation<?, ?> || entity instanceof OneToManyRelation<?, ?>) {
 			entity.fillContentValuesReflective(values);
 			return;
 		}
-		
+
 		ModelFiller filler = Cache.getFiller(entity.mTableInfo.getType());
 		if (filler != null)
 			filler.fillContentValues(entity, values);
 		else
 			entity.fillContentValuesReflective(values);
 	}
-	
+
 	private void fillContentValuesReflective(final ContentValues values) {
 		for (Field field : mTableInfo.getFields()) {
 			final String fieldName = mTableInfo.getColumnName(field);
@@ -167,7 +171,8 @@ public abstract class Model {
 						// set new object type
 						if (value != null) {
 							fieldType = value.getClass();
-							// check that the serializer returned what it promised
+							// check that the serializer returned what it
+							// promised
 							if (!fieldType.equals(typeSerializer.getSerializedType())) {
 								Log.w(String.format("TypeSerializer returned wrong type: expected a %s but got a %s",
 										typeSerializer.getSerializedType(), fieldType));
@@ -176,7 +181,8 @@ public abstract class Model {
 					}
 				}
 
-				// TODO: Find a smarter way to do this? This if block is necessary because we
+				// TODO: Find a smarter way to do this? This if block is
+				// necessary because we
 				// can't know the type until runtime.
 				if (value == null) {
 					values.putNull(fieldName);
@@ -217,17 +223,14 @@ public abstract class Model {
 				else if (ReflectionUtils.isSubclassOf(fieldType, Enum.class)) {
 					values.put(fieldName, ((Enum<?>) value).name());
 				}
-			}
-			catch (IllegalArgumentException e) {
+			} catch (IllegalArgumentException e) {
 				Log.e(e.getClass().getName(), e);
-			}
-			catch (IllegalAccessException e) {
+			} catch (IllegalAccessException e) {
 				Log.e(e.getClass().getName(), e);
 			}
 		}
 	}
 
-	
 	private void loadFromCursorWithFiller(Cursor cursor, ModelFiller filler) {
 		int columnIndex = cursor.getColumnIndex(idName);
 		if (cursor.isNull(columnIndex) == false)
@@ -235,14 +238,15 @@ public abstract class Model {
 		else
 			mId = null;
 		filler.loadFromCursor(this, cursor);
-	}	
-	
+	}
+
 	private void loadFromCursorReflective(Cursor cursor) {
 		/**
-         * Obtain the columns ordered to fix issue #106 (https://github.com/pardom/ActiveAndroid/issues/106)
-         * when the cursor have multiple columns with same name obtained from join tables.
-         */
-        List<String> columnsOrdered = new ArrayList<String>(Arrays.asList(cursor.getColumnNames()));
+		 * Obtain the columns ordered to fix issue #106
+		 * (https://github.com/pardom/ActiveAndroid/issues/106) when the cursor
+		 * have multiple columns with same name obtained from join tables.
+		 */
+		List<String> columnsOrdered = new ArrayList<String>(Arrays.asList(cursor.getColumnNames()));
 		for (Field field : mTableInfo.getFields()) {
 			final String fieldName = mTableInfo.getColumnName(field);
 			Class<?> fieldType = field.getType();
@@ -268,11 +272,11 @@ public abstract class Model {
 				} else {
 					value = ModelHelper.getValueFromCursor(cursor, fieldType, columnIndex);
 				}
-				
+
 				if (value == null) {
 					if (ReflectionUtils.isModel(fieldType)) {
 						value = ModelHelper.getModel(cursor, fieldType, columnIndex);
-					} 
+					}
 					else if (ReflectionUtils.isSubclassOf(fieldType, Enum.class)) {
 						@SuppressWarnings("rawtypes")
 						final Class<? extends Enum> enumType = (Class<? extends Enum>) fieldType;
@@ -288,14 +292,11 @@ public abstract class Model {
 				if (value != null) {
 					field.set(this, value);
 				}
-			}
-			catch (IllegalArgumentException e) {
+			} catch (IllegalArgumentException e) {
 				Log.e(e.getClass().getName(), e);
-			}
-			catch (IllegalAccessException e) {
+			} catch (IllegalAccessException e) {
 				Log.e(e.getClass().getName(), e);
-			}
-			catch (SecurityException e) {
+			} catch (SecurityException e) {
 				Log.e(e.getClass().getName(), e);
 			}
 		}
@@ -304,23 +305,22 @@ public abstract class Model {
 			Cache.addEntity(this);
 		}
 	}
-	
-	
-	//////////////////////////////////////////////////////////////////////////////////////
+
+	// ////////////////////////////////////////////////////////////////////////////////////
 	// PROTECTED METHODS
-	//////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////
 
 	protected final <T extends Model> List<T> getMany(Class<T> type, String foreignKey) {
 		return new Select().from(type).where(Cache.getTableName(type) + "." + foreignKey + "=?", getId()).execute();
 	}
-	
+
 	protected String getIdName() {
 		return idName;
 	}
 
-	//////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////
 	// OVERRIDEN METHODS
-	//////////////////////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////////////////////
 
 	@Override
 	public String toString() {
@@ -332,8 +332,8 @@ public abstract class Model {
 		if (obj instanceof Model && this.mId != null) {
 			final Model other = (Model) obj;
 
-			return this.mId.equals(other.mId)							
-							&& (this.mTableInfo.getTableName().equals(other.mTableInfo.getTableName()));
+			return this.mId.equals(other.mId)
+					&& (this.mTableInfo.getTableName().equals(other.mTableInfo.getTableName()));
 		} else {
 			return this == obj;
 		}
@@ -342,8 +342,14 @@ public abstract class Model {
 	@Override
 	public int hashCode() {
 		int hash = HASH_PRIME;
-		hash += HASH_PRIME * (mId == null ? super.hashCode() : mId.hashCode()); //if id is null, use Object.hashCode()
+		hash += HASH_PRIME * (mId == null ? super.hashCode() : mId.hashCode()); // if
+																				// id
+																				// is
+																				// null,
+																				// use
+																				// Object.hashCode()
 		hash += HASH_PRIME * mTableInfo.getTableName().hashCode();
-		return hash; //To change body of generated methods, choose Tools | Templates.
+		return hash; // To change body of generated methods, choose Tools |
+						// Templates.
 	}
 }

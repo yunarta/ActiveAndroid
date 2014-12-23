@@ -24,6 +24,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.util.LruCache;
 
+import com.activeandroid.sebbia.annotation.DoNotGenerate;
 import com.activeandroid.sebbia.internal.EmptyModelFiller;
 import com.activeandroid.sebbia.internal.ModelFiller;
 import com.activeandroid.sebbia.serializer.TypeSerializer;
@@ -177,7 +178,8 @@ public final class Cache {
 		for (TableInfo tableInfo : sModelInfo.getTableInfos()) {
 			try {
 				Class<? extends Model> type = tableInfo.getType(); 
-				sFillers.put(type, instantiateFiller(type));
+				if (type.getAnnotation(DoNotGenerate.class) == null)
+					sFillers.put(type, instantiateFiller(type));
 			} catch (IllegalAccessException e) {
 				throw new RuntimeException(e);
 			} catch (InstantiationException e) {

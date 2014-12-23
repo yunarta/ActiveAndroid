@@ -9,9 +9,11 @@ import com.activeandroid.sebbia.Cache;
 import com.activeandroid.sebbia.Model;
 import com.activeandroid.sebbia.TableInfo;
 import com.activeandroid.sebbia.annotation.Column;
+import com.activeandroid.sebbia.annotation.DoNotGenerate;
 import com.activeandroid.sebbia.query.Delete;
 import com.activeandroid.sebbia.util.Log;
 
+@DoNotGenerate
 public abstract class OneToManyRelation<T1 extends Model, T2 extends Model> extends Model {
 
 	@Column (name = "entity1")
