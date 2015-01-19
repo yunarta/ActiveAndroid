@@ -27,6 +27,8 @@ import android.support.v4.util.LruCache;
 import com.activeandroid.sebbia.annotation.DoNotGenerate;
 import com.activeandroid.sebbia.internal.EmptyModelFiller;
 import com.activeandroid.sebbia.internal.ModelFiller;
+import com.activeandroid.sebbia.model.ManyToManyRelation;
+import com.activeandroid.sebbia.model.OneToManyRelation;
 import com.activeandroid.sebbia.serializer.TypeSerializer;
 import com.activeandroid.sebbia.util.Log;
 import com.activeandroid.sebbia.util.ReflectionUtils;
@@ -178,7 +180,7 @@ public final class Cache {
 		for (TableInfo tableInfo : sModelInfo.getTableInfos()) {
 			try {
 				Class<? extends Model> type = tableInfo.getType(); 
-				if (type.getAnnotation(DoNotGenerate.class) == null)
+				if (!isDoNotGenerate(type))
 					sFillers.put(type, instantiateFiller(type));
 			} catch (IllegalAccessException e) {
 				throw new RuntimeException(e);
@@ -188,6 +190,14 @@ public final class Cache {
 		}
 		
 		
+	}
+	
+	private static boolean isDoNotGenerate(Class<?> clazz) {
+		if (clazz.isAnnotationPresent(DoNotGenerate.class))
+			return true;
+		if (clazz.getSuperclass() != null)
+			return isDoNotGenerate(clazz.getSuperclass());
+		return false;
 	}
 	
 	@SuppressWarnings("unchecked")
