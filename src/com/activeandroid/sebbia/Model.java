@@ -102,8 +102,12 @@ public abstract class Model {
 	}
 
 	public static <T extends Model> T load(Class<T> type, long id) {
-		TableInfo tableInfo = Cache.getTableInfo(type);
-		return (T) new Select().from(type).where(tableInfo.getIdName() + "=?", id).executeSingle();
+		T model = (T) Cache.getEntity(type, id);
+		if (model == null) { 
+			TableInfo tableInfo = Cache.getTableInfo(type);
+			model = new Select().from(type).where(tableInfo.getIdName() + "=?", id).executeSingle();
+		}
+		return model;
 	}
 
 	public static void saveMultiple(List<? extends Model> entities) {
@@ -137,6 +141,9 @@ public abstract class Model {
 			loadFromCursorWithFiller(cursor, filler);
 		} else {
 			loadFromCursorReflective(cursor);
+		}
+		if (mId != null) {
+			Cache.addEntity(this);
 		}
 	}
 
@@ -299,10 +306,6 @@ public abstract class Model {
 			} catch (SecurityException e) {
 				Log.e(e.getClass().getName(), e);
 			}
-		}
-
-		if (mId != null) {
-			Cache.addEntity(this);
 		}
 	}
 

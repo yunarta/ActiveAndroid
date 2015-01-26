@@ -366,6 +366,9 @@ public final class AnnotationProcessor extends AbstractProcessor {
 			return false;
 
 		TypeElement typeElement = (TypeElement) element;
+		if (type == Enum.class)
+			return typeElement.getKind() == ElementKind.ENUM;
+		
 		TypeMirror superType = typeElement.getSuperclass();
 		if (isTypeOf(superType, type))
 			return true;

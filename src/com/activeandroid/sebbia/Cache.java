@@ -27,8 +27,6 @@ import android.support.v4.util.LruCache;
 import com.activeandroid.sebbia.annotation.DoNotGenerate;
 import com.activeandroid.sebbia.internal.EmptyModelFiller;
 import com.activeandroid.sebbia.internal.ModelFiller;
-import com.activeandroid.sebbia.model.ManyToManyRelation;
-import com.activeandroid.sebbia.model.OneToManyRelation;
 import com.activeandroid.sebbia.serializer.TypeSerializer;
 import com.activeandroid.sebbia.util.Log;
 import com.activeandroid.sebbia.util.ReflectionUtils;
