@@ -5,6 +5,7 @@ import java.util.Map;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteStatement;
+import android.text.TextUtils;
 
 import com.activeandroid.sebbia.Cache;
 import com.activeandroid.sebbia.Model;
@@ -174,7 +175,10 @@ public class ModelHelper {
 	public static Object getEnum(Cursor cursor, Class<?> fieldType, int columnIndex) {
 		@SuppressWarnings("rawtypes")
 		final Class<? extends Enum> enumType = (Class<? extends Enum>) fieldType;
-		return Enum.valueOf(enumType, cursor.getString(columnIndex));
+		String enumName = cursor.getString(columnIndex);
+		if (!TextUtils.isEmpty(enumName))
+			return Enum.valueOf(enumType, cursor.getString(columnIndex));
+		return null;
 	}
 	
 	public static Object getValueFromCursor(Cursor cursor, Class<?> fieldType, int columnIndex) {
