@@ -83,8 +83,8 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		executePragmas(db);
 		executeCreate(db);
-		executeMigrations(db, oldVersion, newVersion);
-		if (db.needUpgrade(newVersion)) {
+		int latestVersion = executeMigrations(db, oldVersion, newVersion);
+		if (latestVersion < newVersion && db.needUpgrade(newVersion)) {
 			AutoMigration.migrate(db, newVersion);
 		}
 	}
@@ -166,8 +166,15 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 		}
 	}
 
-	private boolean executeMigrations(SQLiteDatabase db, int oldVersion, int newVersion) {
-		boolean migrationExecuted = false;
+	/**
+	 * Performs migrations from assets/migrations 
+	 * @param db
+	 * @param oldVersion
+	 * @param newVersion
+	 * @return latest version of migration file or -1 if none was executed.
+	 */
+	private int executeMigrations(SQLiteDatabase db, int oldVersion, int newVersion) {
+		int latestVersion = -1;
 		try {
 			final List<String> files = Arrays.asList(Cache.getContext().getAssets().list(MIGRATION_PATH));
 			Collections.sort(files, new NaturalOrderComparator());
@@ -180,7 +187,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 
 						if (version > oldVersion && version <= newVersion) {
 							executeSqlScript(db, file);
-							migrationExecuted = true;
+							latestVersion = version;
 
 							Log.i(file + " executed succesfully.");
 						}
@@ -199,7 +206,7 @@ public final class DatabaseHelper extends SQLiteOpenHelper {
 			Log.e("Failed to execute migrations.", e);
 		}
 
-		return migrationExecuted;
+		return latestVersion;
 	}
 
 	private void executeSqlScript(SQLiteDatabase db, String file) {
