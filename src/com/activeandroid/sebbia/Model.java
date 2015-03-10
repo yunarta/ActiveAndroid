@@ -118,10 +118,12 @@ public abstract class Model {
 			if (entity.mId == null) {
 				ModelFiller filler = Cache.getFiller(entity.getClass());
 				if (filler != null) {
-					SQLiteStatement statement = entity.mTableInfo.getInsertOrReplaceStatement();
-					statement.clearBindings();
-					filler.bindStatement(entity, statement, entity.mTableInfo.getColumnIndexes());
-					entity.mId = statement.executeInsert();
+					synchronized (entity.getClass()) {
+						SQLiteStatement statement = entity.mTableInfo.getInsertOrReplaceStatement();
+						statement.clearBindings();
+						filler.bindStatement(entity, statement, entity.mTableInfo.getColumnIndexes());
+						entity.mId = statement.executeInsert();
+					}
 				} else {
 					entity.fillContentValuesReflective(values);
 					entity.mId = db.insert(entity.mTableInfo.getTableName(), null, values);
