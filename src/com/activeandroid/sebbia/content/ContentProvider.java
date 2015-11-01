@@ -1,8 +1,5 @@
 package com.activeandroid.sebbia.content;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -15,178 +12,211 @@ import com.activeandroid.sebbia.Configuration;
 import com.activeandroid.sebbia.Model;
 import com.activeandroid.sebbia.TableInfo;
 
-public class ContentProvider extends android.content.ContentProvider {
-	//////////////////////////////////////////////////////////////////////////////////////
-	// PRIVATE CONSTANTS
-	//////////////////////////////////////////////////////////////////////////////////////
+import java.util.ArrayList;
+import java.util.List;
 
-	private static final UriMatcher URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
-	private static final SparseArray<Class<? extends Model>> TYPE_CODES = new SparseArray<Class<? extends Model>>();
+public class ContentProvider extends android.content.ContentProvider
+{
+    //////////////////////////////////////////////////////////////////////////////////////
+    // PRIVATE CONSTANTS
+    //////////////////////////////////////////////////////////////////////////////////////
 
-	//////////////////////////////////////////////////////////////////////////////////////
-	// PRIVATE MEMBERS
-	//////////////////////////////////////////////////////////////////////////////////////
+    private static final UriMatcher                          URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
+    private static final SparseArray<Class<? extends Model>> TYPE_CODES  = new SparseArray<Class<? extends Model>>();
 
-	private static String sAuthority;
-	private static SparseArray<String> sMimeTypeCache = new SparseArray<String>();
+    //////////////////////////////////////////////////////////////////////////////////////
+    // PRIVATE MEMBERS
+    //////////////////////////////////////////////////////////////////////////////////////
 
-	//////////////////////////////////////////////////////////////////////////////////////
-	// PUBLIC METHODS
-	//////////////////////////////////////////////////////////////////////////////////////
+    private static String sAuthority;
+    private static SparseArray<String> sMimeTypeCache = new SparseArray<String>();
 
-	@Override
-	public boolean onCreate() {
-		ActiveAndroid.initialize(getConfiguration());
-		sAuthority = getAuthority();
+    //////////////////////////////////////////////////////////////////////////////////////
+    // PUBLIC METHODS
+    //////////////////////////////////////////////////////////////////////////////////////
 
-		final List<TableInfo> tableInfos = new ArrayList<TableInfo>(Cache.getTableInfos());
-		final int size = tableInfos.size();
-		for (int i = 0; i < size; i++) {
-			final TableInfo tableInfo = tableInfos.get(i);
-			final int tableKey = (i * 2) + 1;
-			final int itemKey = (i * 2) + 2;
+    @Override
+    public boolean onCreate()
+    {
+        ActiveAndroid.initialize(getConfiguration());
+        sAuthority = getAuthority();
 
-			// content://<authority>/<table>
-			URI_MATCHER.addURI(sAuthority, tableInfo.getTableName().toLowerCase(), tableKey);
-			TYPE_CODES.put(tableKey, tableInfo.getType());
+        final List<TableInfo> tableInfos = new ArrayList<TableInfo>(Cache.getTableInfos());
+        final int             size       = tableInfos.size();
+        for (int i = 0; i < size; i++)
+        {
+            final TableInfo tableInfo = tableInfos.get(i);
+            final int tableKey = (i * 2) + 1;
+            final int itemKey = (i * 2) + 2;
 
-			// content://<authority>/<table>/<id>
-			URI_MATCHER.addURI(sAuthority, tableInfo.getTableName().toLowerCase() + "/#", itemKey);
-			TYPE_CODES.put(itemKey, tableInfo.getType());
-		}
+            // content://<authority>/<table>
+            URI_MATCHER.addURI(sAuthority, "*/" + tableInfo.getTableName().toLowerCase(), tableKey);
+            TYPE_CODES.put(tableKey, tableInfo.getType());
 
-		return true;
-	}
+            // content://<authority>/<table>/<id>
+            URI_MATCHER.addURI(sAuthority, "*/" + tableInfo.getTableName().toLowerCase() + "/#", itemKey);
+            TYPE_CODES.put(itemKey, tableInfo.getType());
+        }
 
-	@Override
-	public String getType(Uri uri) {
-		final int match = URI_MATCHER.match(uri);
+        return true;
+    }
 
-		String cachedMimeType = sMimeTypeCache.get(match);
-		if (cachedMimeType != null) {
-			return cachedMimeType;
-		}
+    @Override
+    public String getType(Uri uri)
+    {
+        final int match = URI_MATCHER.match(uri);
 
-		final Class<? extends Model> type = getModelType(uri);
-		final boolean single = ((match % 2) == 0);
+        String cachedMimeType = sMimeTypeCache.get(match);
+        if (cachedMimeType != null)
+        {
+            return cachedMimeType;
+        }
 
-		StringBuilder mimeType = new StringBuilder();
-		mimeType.append("vnd");
-		mimeType.append(".");
-		mimeType.append(sAuthority);
-		mimeType.append(".");
-		mimeType.append(single ? "item" : "dir");
-		mimeType.append("/");
-		mimeType.append("vnd");
-		mimeType.append(".");
-		mimeType.append(sAuthority);
-		mimeType.append(".");
-		mimeType.append(Cache.getTableName(type));
+        final Class<? extends Model> type   = getModelType(uri);
+        final boolean                single = ((match % 2) == 0);
 
-		sMimeTypeCache.append(match, mimeType.toString());
+        StringBuilder mimeType = new StringBuilder();
+        mimeType.append("vnd");
+        mimeType.append(".");
+        mimeType.append(sAuthority);
+        mimeType.append(".");
+        mimeType.append(single ? "item" : "dir");
+        mimeType.append("/");
+        mimeType.append("vnd");
+        mimeType.append(".");
+        mimeType.append(sAuthority);
+        mimeType.append(".");
+        mimeType.append(Cache.getTableName(type));
 
-		return mimeType.toString();
-	}
+        sMimeTypeCache.append(match, mimeType.toString());
 
-	// SQLite methods
+        return mimeType.toString();
+    }
 
-	@Override
-	public Uri insert(Uri uri, ContentValues values) {
-		final Class<? extends Model> type = getModelType(uri);
-		final Long id = Cache.openDatabase().insert(Cache.getTableName(type), null, values);
+    // SQLite methods
 
-		if (id != null && id > 0) {
-			Uri retUri = createUri(type, id);
-			notifyChange(retUri);
+    @Override
+    public Uri insert(Uri uri, ContentValues values)
+    {
+        final Class<? extends Model> type    = getModelType(uri);
+        String                       database = getDatabase(uri);
 
-			return retUri;
-		}
+        final Long id = Cache.openDatabase(database).insert(Cache.getTableName(type), null, values);
 
-		return null;
-	}
+        if (id != null && id > 0)
+        {
+            Uri retUri = createUri(type, id);
+            notifyChange(retUri);
 
-	@Override
-	public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-		final Class<? extends Model> type = getModelType(uri);
-		final int count = Cache.openDatabase().update(Cache.getTableName(type), values, selection, selectionArgs);
+            return retUri;
+        }
 
-		notifyChange(uri);
+        return null;
+    }
 
-		return count;
-	}
+    @Override
+    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs)
+    {
+        final Class<? extends Model> type    = getModelType(uri);
+        String                       database = getDatabase(uri);
 
-	@Override
-	public int delete(Uri uri, String selection, String[] selectionArgs) {
-		final Class<? extends Model> type = getModelType(uri);
-		final int count = Cache.openDatabase().delete(Cache.getTableName(type), selection, selectionArgs);
+        final int count = Cache.openDatabase(database).update(Cache.getTableName(type), values, selection, selectionArgs);
 
-		notifyChange(uri);
+        notifyChange(uri);
 
-		return count;
-	}
+        return count;
+    }
 
-	@Override
-	public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-		final Class<? extends Model> type = getModelType(uri);
-		final Cursor cursor = Cache.openDatabase().query(
-				Cache.getTableName(type),
-				projection,
-				selection,
-				selectionArgs,
-				null,
-				null,
-				sortOrder);
+    @Override
+    public int delete(Uri uri, String selection, String[] selectionArgs)
+    {
+        final Class<? extends Model> type    = getModelType(uri);
+        String                       database = getDatabase(uri);
+        final int                    count   = Cache.openDatabase(database).delete(Cache.getTableName(type), selection, selectionArgs);
 
-		cursor.setNotificationUri(getContext().getContentResolver(), uri);
+        notifyChange(uri);
 
-		return cursor;
-	}
+        return count;
+    }
 
-	//////////////////////////////////////////////////////////////////////////////////////
-	// PUBLIC METHODS
-	//////////////////////////////////////////////////////////////////////////////////////
+    @Override
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder)
+    {
+        final Class<? extends Model> type    = getModelType(uri);
+        String                       database = getDatabase(uri);
 
-	public static Uri createUri(Class<? extends Model> type, Long id) {
-		final StringBuilder uri = new StringBuilder();
-		uri.append("content://");
-		uri.append(sAuthority);
-		uri.append("/");
-		uri.append(Cache.getTableName(type).toLowerCase());
+        final Cursor cursor = Cache.openDatabase(database).query(
+                Cache.getTableName(type),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder);
 
-		if (id != null) {
-			uri.append("/");
-			uri.append(id.toString());
-		}
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
 
-		return Uri.parse(uri.toString());
-	}
+        return cursor;
+    }
 
-	//////////////////////////////////////////////////////////////////////////////////////
-	// PROTECTED METHODS
-	//////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////
+    // PUBLIC METHODS
+    //////////////////////////////////////////////////////////////////////////////////////
 
-	protected String getAuthority() {
-		return getContext().getPackageName();
-	}
+    public static Uri createUri(Class<? extends Model> type, Long id)
+    {
+        final StringBuilder uri = new StringBuilder();
+        uri.append("content://");
+        uri.append(sAuthority);
+        uri.append("/");
+        uri.append(Cache.getTableName(type).toLowerCase());
 
-	protected Configuration getConfiguration() {
-		return new Configuration.Builder(getContext()).create();
-	}
+        if (id != null)
+        {
+            uri.append("/");
+            uri.append(id.toString());
+        }
 
-	//////////////////////////////////////////////////////////////////////////////////////
-	// PRIVATE METHODS
-	//////////////////////////////////////////////////////////////////////////////////////
+        return Uri.parse(uri.toString());
+    }
 
-	private Class<? extends Model> getModelType(Uri uri) {
-		final int code = URI_MATCHER.match(uri);
-		if (code != UriMatcher.NO_MATCH) {
-			return TYPE_CODES.get(code);
-		}
+    //////////////////////////////////////////////////////////////////////////////////////
+    // PROTECTED METHODS
+    //////////////////////////////////////////////////////////////////////////////////////
 
-		return null;
-	}
+    protected String getAuthority()
+    {
+        return getContext().getPackageName();
+    }
 
-	private void notifyChange(Uri uri) {
-		getContext().getContentResolver().notifyChange(uri, null);
-	}
+    protected Configuration getConfiguration()
+    {
+        return new Configuration.Builder(getContext()).create();
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    // PRIVATE METHODS
+    //////////////////////////////////////////////////////////////////////////////////////
+
+    private Class<? extends Model> getModelType(Uri uri)
+    {
+        final int code = URI_MATCHER.match(uri);
+        if (code != UriMatcher.NO_MATCH)
+        {
+            return TYPE_CODES.get(code);
+        }
+
+        return null;
+    }
+
+    private String getDatabase(Uri uri)
+    {
+        List<String> segments = uri.getPathSegments();
+        return segments.get(0);
+    }
+
+    private void notifyChange(Uri uri)
+    {
+        getContext().getContentResolver().notifyChange(uri, null);
+    }
 }

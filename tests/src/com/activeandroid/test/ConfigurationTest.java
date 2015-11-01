@@ -9,9 +9,11 @@ import com.activeandroid.sebbia.Configuration;
 import com.activeandroid.sebbia.Model;
 import com.activeandroid.sebbia.annotation.Table;
 
-public class ConfigurationTest extends AndroidTestCase {
+public class ConfigurationTest extends AndroidTestCase
+{
 
-    public void testDefaultValue() throws IOException, ClassNotFoundException {
+    public void testDefaultValue() throws IOException, ClassNotFoundException
+    {
         Configuration conf = new Configuration.Builder(getContext()).create();
         assertNotNull(conf.getContext());
         assertEquals(1024, conf.getCacheSize());
@@ -23,7 +25,8 @@ public class ConfigurationTest extends AndroidTestCase {
         assertEquals(Configuration.SQL_PARSER_LEGACY, conf.getSqlParser());
     }
 
-    public void testCreateConfigurationWithMockModel() {
+    public void testCreateConfigurationWithMockModel()
+    {
         Configuration conf = new Configuration.Builder(getContext())
                 .addModelClass(ConfigurationTestModel.class)
                 .create();
@@ -33,6 +36,7 @@ public class ConfigurationTest extends AndroidTestCase {
     }
 
     @Table(name = "ConfigurationTestModel")
-    static class ConfigurationTestModel extends Model {
+    static class ConfigurationTestModel extends Model
+    {
     }
 }

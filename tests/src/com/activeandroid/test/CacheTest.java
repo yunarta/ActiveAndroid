@@ -11,10 +11,12 @@ import com.activeandroid.sebbia.Model;
 import com.activeandroid.sebbia.TableInfo;
 import com.activeandroid.sebbia.annotation.Table;
 
-public class CacheTest extends AndroidTestCase {
+public class CacheTest extends AndroidTestCase
+{
 
     @Override
-    protected void setUp() {
+    protected void setUp()
+    {
         Configuration conf = new Configuration.Builder(getContext())
                 .setDatabaseName("CacheTest")
                 .addModelClasses(CacheTestModel.class, CacheTestModel2.class)
@@ -22,7 +24,8 @@ public class CacheTest extends AndroidTestCase {
         ActiveAndroid.initialize(conf, true);
     }
 
-    public void testGetTableInfos() {
+    public void testGetTableInfos()
+    {
         assertNotNull(Cache.getContext());
         Collection<TableInfo> tableInfos = Cache.getTableInfos();
         assertEquals(2, tableInfos.size());
@@ -41,10 +44,12 @@ public class CacheTest extends AndroidTestCase {
     }
 
     @Table(name = "CacheTestModel")
-    static class CacheTestModel extends Model {
+    static class CacheTestModel extends Model
+    {
     }
 
     @Table(name = "CacheTestModel2")
-    static class CacheTestModel2 extends Model {
+    static class CacheTestModel2 extends Model
+    {
     }
 }

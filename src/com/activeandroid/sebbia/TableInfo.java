@@ -16,15 +16,6 @@ package com.activeandroid.sebbia;
  * limitations under the License.
  */
 
-import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.text.TextUtils;
@@ -35,38 +26,51 @@ import com.activeandroid.sebbia.util.Log;
 import com.activeandroid.sebbia.util.ReflectionUtils;
 import com.activeandroid.sebbia.util.SQLiteUtils;
 
-public final class TableInfo {
-	//////////////////////////////////////////////////////////////////////////////////////
-	// PRIVATE MEMBERS
-	//////////////////////////////////////////////////////////////////////////////////////
+import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
-	private Class<? extends Model> mType;
-	private String mTableName;
-	private String mIdName = Table.DEFAULT_ID_NAME;
+public final class TableInfo
+{
+    //////////////////////////////////////////////////////////////////////////////////////
+    // PRIVATE MEMBERS
+    //////////////////////////////////////////////////////////////////////////////////////
 
-	private Map<Field, String> mColumnNames = new LinkedHashMap<Field, String>();
-	
-	private SQLiteStatement mInsertStatement;
-	private SQLiteStatement mInsertOrReplaceStatement;
-	private SQLiteStatement mUpdateStatement;
-	
-	private Map<String, Integer> mColumnIndexes;
+    private Class<? extends Model> mType;
+    private String                 mTableName;
+    private String mIdName = Table.DEFAULT_ID_NAME;
 
-	//////////////////////////////////////////////////////////////////////////////////////
-	// CONSTRUCTORS
-	//////////////////////////////////////////////////////////////////////////////////////
+    private Map<Field, String> mColumnNames = new LinkedHashMap<Field, String>();
 
-	public TableInfo(Class<? extends Model> type) {
-		mType = type;
+    private SQLiteStatement mInsertStatement;
+    private SQLiteStatement mInsertOrReplaceStatement;
+    private SQLiteStatement mUpdateStatement;
 
-		final Table tableAnnotation = type.getAnnotation(Table.class);
+    private Map<String, Integer> mColumnIndexes;
 
-        if (tableAnnotation != null) {
-			mTableName = tableAnnotation.name();
-			mIdName = tableAnnotation.id();
-		}
-		else {
-			mTableName = type.getSimpleName();
+    //////////////////////////////////////////////////////////////////////////////////////
+    // CONSTRUCTORS
+    //////////////////////////////////////////////////////////////////////////////////////
+
+    public TableInfo(Class<? extends Model> type)
+    {
+        mType = type;
+
+        final Table tableAnnotation = type.getAnnotation(Table.class);
+
+        if (tableAnnotation != null)
+        {
+            mTableName = tableAnnotation.name();
+            mIdName = tableAnnotation.id();
+        }
+        else
+        {
+            mTableName = type.getSimpleName();
         }
 
         // Manually add the id column since it is not declared like the other columns.
@@ -76,95 +80,117 @@ public final class TableInfo {
         List<Field> fields = new LinkedList<Field>(ReflectionUtils.getDeclaredColumnFields(type));
         Collections.reverse(fields);
 
-        for (Field field : fields) {
-            if (field.isAnnotationPresent(Column.class)) {
+        for (Field field : fields)
+        {
+            if (field.isAnnotationPresent(Column.class))
+            {
                 final Column columnAnnotation = field.getAnnotation(Column.class);
                 String columnName = columnAnnotation.name();
-                if (TextUtils.isEmpty(columnName)) {
+                if (TextUtils.isEmpty(columnName))
+                {
                     columnName = field.getName();
                 }
 
                 mColumnNames.put(field, columnName);
             }
         }
-        
+
         mColumnIndexes = new HashMap<String, Integer>(mColumnNames.size());
         int index = 1;
-        for (String column : mColumnNames.values()) {
-        	mColumnIndexes.put(column, index++);
+        for (String column : mColumnNames.values())
+        {
+            mColumnIndexes.put(column, index++);
         }
-	}
+    }
 
-	//////////////////////////////////////////////////////////////////////////////////////
-	// PUBLIC METHODS
-	//////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////
+    // PUBLIC METHODS
+    //////////////////////////////////////////////////////////////////////////////////////
 
-	public Class<? extends Model> getType() {
-		return mType;
-	}
+    public Class<? extends Model> getType()
+    {
+        return mType;
+    }
 
-	public String getTableName() {
-		return mTableName;
-	}
+    public String getTableName()
+    {
+        return mTableName;
+    }
 
-	public String getIdName() {
-		return mIdName;
-	}
+    public String getIdName()
+    {
+        return mIdName;
+    }
 
-	public Collection<Field> getFields() {
-		return mColumnNames.keySet();
-	}
-	
-	public Collection<String> getColumnNames() {
-		return mColumnNames.values();
-	}
+    public Collection<Field> getFields()
+    {
+        return mColumnNames.keySet();
+    }
 
-	public String getColumnName(Field field) {
-		return mColumnNames.get(field);
-	}
-	
-	public SQLiteStatement getInsertStatement() {
-		if (mInsertStatement == null) {
-			SQLiteDatabase db = Cache.openDatabase(); 
-			mInsertStatement = db.compileStatement(SQLiteUtils.createInsertStatement("INSERT INTO ", this));
-		}
-		return mInsertStatement;
-	}
-	
-	public SQLiteStatement getUpdateStatement() {
-		if (mUpdateStatement == null) {
-			SQLiteDatabase db = Cache.openDatabase(); 
-			mUpdateStatement = db.compileStatement(SQLiteUtils.createUpdateStatement(this));
-		}
-		return mUpdateStatement;
-	}
-	
-	public SQLiteStatement getInsertOrReplaceStatement() {
-		if (mInsertOrReplaceStatement == null) {
-			SQLiteDatabase db = Cache.openDatabase(); 
-			mInsertOrReplaceStatement = db.compileStatement(SQLiteUtils.createInsertStatement("INSERT OR REPLACE INTO ", this));
-		}
-		return mInsertOrReplaceStatement;
-	}
-	
-    private Field getIdField(Class<?> type) {
-        if (type.equals(Model.class)) {
-            try {
+    public Collection<String> getColumnNames()
+    {
+        return mColumnNames.values();
+    }
+
+    public String getColumnName(Field field)
+    {
+        return mColumnNames.get(field);
+    }
+
+    public SQLiteStatement getInsertStatement(String database)
+    {
+        if (mInsertStatement == null)
+        {
+            SQLiteDatabase db = Cache.openDatabase(database);
+            mInsertStatement = db.compileStatement(SQLiteUtils.createInsertStatement("INSERT INTO ", this));
+        }
+        return mInsertStatement;
+    }
+
+    public SQLiteStatement getUpdateStatement(String database)
+    {
+        if (mUpdateStatement == null)
+        {
+            SQLiteDatabase db = Cache.openDatabase(database);
+            mUpdateStatement = db.compileStatement(SQLiteUtils.createUpdateStatement(this));
+        }
+        return mUpdateStatement;
+    }
+
+    public SQLiteStatement getInsertOrReplaceStatement(String database)
+    {
+        if (mInsertOrReplaceStatement == null)
+        {
+            SQLiteDatabase db = Cache.openDatabase(database);
+            mInsertOrReplaceStatement = db.compileStatement(SQLiteUtils.createInsertStatement("INSERT OR REPLACE INTO ", this));
+        }
+        return mInsertOrReplaceStatement;
+    }
+
+    private Field getIdField(Class<?> type)
+    {
+        if (type.equals(Model.class))
+        {
+            try
+            {
                 return type.getDeclaredField("mId");
             }
-            catch (NoSuchFieldException e) {
+            catch (NoSuchFieldException e)
+            {
                 Log.e("Impossible!", e.toString());
             }
         }
-        else if (type.getSuperclass() != null) {
+        else if (type.getSuperclass() != null)
+        {
             return getIdField(type.getSuperclass());
         }
 
         return null;
     }
-    
-    public Map<String, Integer> getColumnIndexes() {
-		return mColumnIndexes;
-	}
+
+    public Map<String, Integer> getColumnIndexes()
+    {
+        return mColumnIndexes;
+    }
 
 }

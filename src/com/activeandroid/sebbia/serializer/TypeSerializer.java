@@ -16,12 +16,13 @@ package com.activeandroid.sebbia.serializer;
  * limitations under the License.
  */
 
-public abstract class TypeSerializer {
-	public abstract Class<?> getDeserializedType();
+public abstract class TypeSerializer
+{
+    public abstract Class<?> getDeserializedType();
 
-	public abstract Class<?> getSerializedType();
+    public abstract Class<?> getSerializedType();
 
-	public abstract Object serialize(Object data);
+    public abstract Object serialize(Object data);
 
-	public abstract Object deserialize(Object data);
+    public abstract Object deserialize(Object data);
 }

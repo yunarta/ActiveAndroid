@@ -1,8 +1,5 @@
 package com.activeandroid.test.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.database.Cursor;
 
 import com.activeandroid.sebbia.ActiveAndroid;
@@ -13,44 +10,56 @@ import com.activeandroid.sebbia.annotation.Column;
 import com.activeandroid.sebbia.annotation.Table;
 import com.activeandroid.sebbia.query.Delete;
 
-public class EnumTest extends ModelTestCase {
+import java.util.ArrayList;
+import java.util.List;
 
-	public enum Enumeration {
-		TYPE_A,
-		TYPE_B,
-		TYPE_C
-	}
+public class EnumTest extends ModelTestCase
+{
 
-	@Table(name = "enum_model")
-	public static class EnumModel extends Model {
+    public enum Enumeration
+    {
+        TYPE_A,
+        TYPE_B,
+        TYPE_C
+    }
 
-		@Column(name = "enum")
-		Enumeration enumeration;
+    @Table(name = "enum_model")
+    public static class EnumModel extends Model
+    {
 
-		public EnumModel() {
+        @Column(name = "enum")
+        Enumeration enumeration;
 
-		}
+        public EnumModel()
+        {
 
-		public EnumModel(Enumeration enumeration) {
-			super();
-			this.enumeration = enumeration;
-		}
+        }
 
-	}
+        public EnumModel(Enumeration enumeration)
+        {
+            super();
+            this.enumeration = enumeration;
+        }
 
-	public void testEnumSaving() {
-		new Delete().from(EnumModel.class).execute();
-		List<EnumModel> models = new ArrayList<EnumModel>();
-		for (Enumeration enumeration : Enumeration.values()) 
-			models.add(new EnumModel(enumeration));
-		
-		Model.saveMultiple(models);
-		
-		TableInfo tableInfo = Cache.getTableInfo(EnumModel.class);
-		Cursor cursor = ActiveAndroid.getDatabase().query(tableInfo.getTableName(), new String[] {"enum"}, null, null, null, null, null);
-		while (cursor.moveToNext()) {
-			assertTrue(cursor.getString(0).equals(Enumeration.values()[cursor.getPosition()]));
-		}
-		cursor.close();
-	}
+    }
+
+    public void testEnumSaving()
+    {
+        new Delete().from(EnumModel.class).execute("test");
+        List<EnumModel> models = new ArrayList<EnumModel>();
+        for (Enumeration enumeration : Enumeration.values())
+        {
+            models.add(new EnumModel(enumeration));
+        }
+
+        Model.saveMultiple("test", models);
+
+        TableInfo tableInfo = Cache.getTableInfo(EnumModel.class);
+        Cursor    cursor    = ActiveAndroid.getDatabase("test").query(tableInfo.getTableName(), new String[]{"enum"}, null, null, null, null, null);
+        while (cursor.moveToNext())
+        {
+            assertTrue(cursor.getString(0).equals(Enumeration.values()[cursor.getPosition()]));
+        }
+        cursor.close();
+    }
 }

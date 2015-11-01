@@ -18,16 +18,19 @@ package com.activeandroid.sebbia.app;
 
 import com.activeandroid.sebbia.ActiveAndroid;
 
-public class Application extends android.app.Application {
-	@Override
-	public void onCreate() {
-		super.onCreate();
-		ActiveAndroid.initialize(this);
-	}
-	
-	@Override
-	public void onTerminate() {
-		super.onTerminate();
-		ActiveAndroid.dispose();
-	}
+public class Application extends android.app.Application
+{
+    @Override
+    public void onCreate()
+    {
+        super.onCreate();
+        ActiveAndroid.initialize(this);
+    }
+
+    @Override
+    public void onTerminate()
+    {
+        super.onTerminate();
+        ActiveAndroid.dispose();
+    }
 }

@@ -25,7 +25,8 @@ import java.io.IOException;
 import com.activeandroid.sebbia.util.Log;
 
 
-public class IOUtils {
+public class IOUtils
+{
 
     /**
      * <p>
@@ -33,17 +34,23 @@ public class IOUtils {
      * </p>
      * Equivalent to {@link Closeable#close()}, except any exceptions will be ignored. This is
      * typically used in finally blocks.
+     *
      * @param closeable A {@link Closeable} to close.
      */
-    public static void closeQuietly(final Closeable closeable) {
+    public static void closeQuietly(final Closeable closeable)
+    {
 
-        if (closeable == null) {
+        if (closeable == null)
+        {
             return;
         }
 
-        try {
+        try
+        {
             closeable.close();
-        } catch (final IOException e) {
+        }
+        catch (final IOException e)
+        {
             Log.e("Couldn't close closeable.", e);
         }
     }
@@ -54,17 +61,23 @@ public class IOUtils {
      * </p>
      * Equivalent to {@link Cursor#close()}, except any exceptions will be ignored. This is
      * typically used in finally blocks.
+     *
      * @param cursor A {@link Cursor} to close.
      */
-    public static void closeQuietly(final Cursor cursor) {
+    public static void closeQuietly(final Cursor cursor)
+    {
 
-        if (cursor == null) {
+        if (cursor == null)
+        {
             return;
         }
 
-        try {
+        try
+        {
             cursor.close();
-        } catch (final Exception e) {
+        }
+        catch (final Exception e)
+        {
             Log.e("Couldn't close cursor.", e);
         }
     }

@@ -19,13 +19,16 @@ package com.activeandroid.test.query;
 import com.activeandroid.sebbia.query.Delete;
 import com.activeandroid.test.MockModel;
 
-public class DeleteTest extends SqlableTestCase {
-	public void testDelete() {
-		assertSqlEquals("DELETE ", new Delete());
-	}
+public class DeleteTest extends SqlableTestCase
+{
+    public void testDelete()
+    {
+        assertSqlEquals("DELETE ", new Delete());
+    }
 
-	public void testFrom() {
-		assertSqlEquals("DELETE FROM MockModel",
-				new Delete().from(MockModel.class));
-	}
+    public void testFrom()
+    {
+        assertSqlEquals("DELETE FROM MockModel",
+                new Delete().from(MockModel.class));
+    }
 }

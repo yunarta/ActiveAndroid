@@ -16,6 +16,7 @@ package com.activeandroid.sebbia.query;
  * limitations under the License.
  */
 
-public interface Sqlable {
-	public String toSql();
+public interface Sqlable
+{
+    public String toSql();
 }

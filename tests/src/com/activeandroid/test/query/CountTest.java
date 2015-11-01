@@ -1,21 +1,24 @@
 
 package com.activeandroid.test.query;
 
-import java.util.List;
-
 import com.activeandroid.sebbia.query.Delete;
 import com.activeandroid.sebbia.query.From;
 import com.activeandroid.sebbia.query.Select;
 import com.activeandroid.test.MockModel;
 
+import java.util.List;
 
-public class CountTest extends SqlableTestCase {
 
-    private void cleanTable() {
-        new Delete().from(MockModel.class).execute();
+public class CountTest extends SqlableTestCase
+{
+
+    private void cleanTable()
+    {
+        new Delete().from(MockModel.class).execute("test");
     }
 
-    private void populateTable() {
+    private void populateTable()
+    {
         MockModel m1 = new MockModel();
         MockModel m2 = new MockModel();
         MockModel m3 = new MockModel();
@@ -24,15 +27,16 @@ public class CountTest extends SqlableTestCase {
         m2.intField = 1;
         m3.intField = 2;
 
-        m1.save();
-        m2.save();
-        m3.save();
+        m1.save("test");
+        m2.save("test");
+        m3.save("test");
     }
 
     /**
      * Should be a simple count for the entire table.
      */
-    public void testCountTableSql() {
+    public void testCountTableSql()
+    {
         final String expected = "SELECT COUNT(*) FROM MockModel";
 
         String actual = new Select()
@@ -45,7 +49,8 @@ public class CountTest extends SqlableTestCase {
     /**
      * Should be a count with the specified where-clause.
      */
-    public void testCountWhereClauseSql() {
+    public void testCountWhereClauseSql()
+    {
         final String expected = "SELECT COUNT(*) FROM MockModel WHERE intField = ?";
 
         String actual = new Select()
@@ -60,7 +65,8 @@ public class CountTest extends SqlableTestCase {
      * Shouldn't include <i>order by</i> as it has no influence on the result of <i>count</i> and
      * should improve performance.
      */
-    public void testCountOrderBySql() {
+    public void testCountOrderBySql()
+    {
         final String expected = "SELECT COUNT(*) FROM MockModel WHERE intField <> ? GROUP BY intField";
 
         String actual = new Select()
@@ -76,15 +82,16 @@ public class CountTest extends SqlableTestCase {
     /**
      * Should return the same count as there are entries in the result set/table.
      */
-    public void testCountTable() {
+    public void testCountTable()
+    {
         cleanTable();
         populateTable();
 
         From from = new Select()
                 .from(MockModel.class);
 
-        final List<MockModel> list = from.execute();
-        final int count = from.count();
+        final List<MockModel> list  = from.execute("test");
+        final int             count = from.count("test");
 
         assertEquals(3, count);
         assertEquals(list.size(), count);
@@ -94,7 +101,8 @@ public class CountTest extends SqlableTestCase {
      * Should return the same count as there are entries in the result set if the where-clause
      * matches several entries.
      */
-    public void testCountWhereClause() {
+    public void testCountWhereClause()
+    {
         cleanTable();
         populateTable();
 
@@ -102,8 +110,8 @@ public class CountTest extends SqlableTestCase {
                 .from(MockModel.class)
                 .where("intField = ?", 1);
 
-        final List<MockModel> list = from.execute();
-        final int count = from.count();
+        final List<MockModel> list  = from.execute("test");
+        final int             count = from.count("test");
 
         assertEquals(2, count);
         assertEquals(list.size(), count);
@@ -113,7 +121,8 @@ public class CountTest extends SqlableTestCase {
      * Should return the same count as there are entries in the result set if the where-clause
      * matches zero entries.
      */
-    public void testCountEmptyResult() {
+    public void testCountEmptyResult()
+    {
         cleanTable();
         populateTable();
 
@@ -121,8 +130,8 @@ public class CountTest extends SqlableTestCase {
                 .from(MockModel.class)
                 .where("intField = ?", 3);
 
-        final List<MockModel> list = from.execute();
-        final int count = from.count();
+        final List<MockModel> list  = from.execute("test");
+        final int             count = from.count("test");
 
         assertEquals(0, count);
         assertEquals(list.size(), count);
@@ -131,7 +140,8 @@ public class CountTest extends SqlableTestCase {
     /**
      * Should not change the result if order by is used.
      */
-    public void testCountOrderBy() {
+    public void testCountOrderBy()
+    {
         cleanTable();
         populateTable();
 
@@ -140,8 +150,8 @@ public class CountTest extends SqlableTestCase {
                 .where("intField = ?", 1)
                 .orderBy("intField ASC");
 
-        final List<MockModel> list = from.execute();
-        final int count = from.count();
+        final List<MockModel> list  = from.execute("test");
+        final int             count = from.count("test");
 
         assertEquals(2, count);
         assertEquals(list.size(), count);
@@ -151,7 +161,8 @@ public class CountTest extends SqlableTestCase {
      * Should return the total number of rows, even if the rows are grouped. May seem weird, just
      * test it in an SQL explorer.
      */
-    public void testCountGroupBy() {
+    public void testCountGroupBy()
+    {
         cleanTable();
         populateTable();
 
@@ -160,8 +171,8 @@ public class CountTest extends SqlableTestCase {
                 .groupBy("intField")
                 .having("intField = 1");
 
-        final List<MockModel> list = from.execute();
-        final int count = from.count();
+        final List<MockModel> list  = from.execute("test");
+        final int             count = from.count("test");
 
         assertEquals(2, count);
         assertEquals(1, list.size());

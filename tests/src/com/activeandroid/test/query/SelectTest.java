@@ -19,32 +19,39 @@ package com.activeandroid.test.query;
 import com.activeandroid.sebbia.query.Select;
 import com.activeandroid.test.MockModel;
 
-public class SelectTest extends SqlableTestCase {
-	public void testSelectEmpty() {
-		assertSqlEquals("SELECT * ", new Select());
-	}
+public class SelectTest extends SqlableTestCase
+{
+    public void testSelectEmpty()
+    {
+        assertSqlEquals("SELECT * ", new Select());
+    }
 
-	public void testSelectAll() {
-		assertSqlEquals("SELECT ALL * ", new Select().all());
-		assertSqlEquals("SELECT ALL * ", new Select().distinct().all());
-	}
+    public void testSelectAll()
+    {
+        assertSqlEquals("SELECT ALL * ", new Select().all());
+        assertSqlEquals("SELECT ALL * ", new Select().distinct().all());
+    }
 
-	public void testSelectDistinct() {
-		assertSqlEquals("SELECT DISTINCT * ", new Select().distinct());
-		assertSqlEquals("SELECT DISTINCT * ", new Select().all().distinct());
-	}
+    public void testSelectDistinct()
+    {
+        assertSqlEquals("SELECT DISTINCT * ", new Select().distinct());
+        assertSqlEquals("SELECT DISTINCT * ", new Select().all().distinct());
+    }
 
-	public void testSelectStringColumns() {
-		assertSqlEquals("SELECT a, b, c ", new Select("a", "b", "c"));
-	}
+    public void testSelectStringColumns()
+    {
+        assertSqlEquals("SELECT a, b, c ", new Select("a", "b", "c"));
+    }
 
-	public void testSelectDistinctColumns() {
-		assertSqlEquals("SELECT DISTINCT a, b, c ",
-				new Select("a", "b", "c").distinct());
-	}
+    public void testSelectDistinctColumns()
+    {
+        assertSqlEquals("SELECT DISTINCT a, b, c ",
+                new Select("a", "b", "c").distinct());
+    }
 
-	public void testFrom() {
-		assertSqlEquals("SELECT ALL * FROM MockModel",
-				new Select().all().from(MockModel.class));
-	}
+    public void testFrom()
+    {
+        assertSqlEquals("SELECT ALL * FROM MockModel",
+                new Select().all().from(MockModel.class));
+    }
 }
