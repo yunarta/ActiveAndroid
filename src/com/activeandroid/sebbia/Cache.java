@@ -31,188 +31,229 @@ import com.activeandroid.sebbia.serializer.TypeSerializer;
 import com.activeandroid.sebbia.util.Log;
 import com.activeandroid.sebbia.util.ReflectionUtils;
 
-public final class Cache {
-	//////////////////////////////////////////////////////////////////////////////////////
-	// PUBLIC CONSTANTS
-	//////////////////////////////////////////////////////////////////////////////////////
+public final class Cache
+{
+    //////////////////////////////////////////////////////////////////////////////////////
+    // PUBLIC CONSTANTS
+    //////////////////////////////////////////////////////////////////////////////////////
 
-	public static final int DEFAULT_CACHE_SIZE = 1024;
+    public static final int DEFAULT_CACHE_SIZE = 1024;
 
-	//////////////////////////////////////////////////////////////////////////////////////
-	// PRIVATE MEMBERS
-	//////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////
+    // PRIVATE MEMBERS
+    //////////////////////////////////////////////////////////////////////////////////////
 
-	private static Context sContext;
+    private static Context sContext;
 
-	private static ModelInfo sModelInfo;
-	private static DatabaseHelper sDatabaseHelper;
+    private static ModelInfo      sModelInfo;
+    private static DatabaseHelper sDatabaseHelper;
 
-	private static LruCache<String, Model> sEntities;
+    private static LruCache<String, Model> sEntities;
 
-	private static boolean sIsInitialized = false;
-	
-	private static Map<Class<? extends Model>, ModelFiller> sFillers;
+    private static boolean sIsInitialized = false;
 
-	//////////////////////////////////////////////////////////////////////////////////////
-	// CONSTRUCTORS
-	//////////////////////////////////////////////////////////////////////////////////////
+    private static Map<Class<? extends Model>, ModelFiller> sFillers;
 
-	private Cache() {
-	}
+    //////////////////////////////////////////////////////////////////////////////////////
+    // CONSTRUCTORS
+    //////////////////////////////////////////////////////////////////////////////////////
 
-	//////////////////////////////////////////////////////////////////////////////////////
-	// PUBLIC METHODS
-	//////////////////////////////////////////////////////////////////////////////////////
+    private Cache()
+    {
+    }
 
-	public static synchronized void initialize(Configuration configuration) {
-		if (sIsInitialized) {
-			Log.v("ActiveAndroid already initialized.");
-			return;
-		}
+    //////////////////////////////////////////////////////////////////////////////////////
+    // PUBLIC METHODS
+    //////////////////////////////////////////////////////////////////////////////////////
 
-		sContext = configuration.getContext();
-		sModelInfo = new ModelInfo(configuration);
-		sDatabaseHelper = new DatabaseHelper(configuration);
+    public static synchronized void initialize(Configuration configuration)
+    {
+        if (sIsInitialized)
+        {
+            Log.v("ActiveAndroid already initialized.");
+            return;
+        }
 
-		// TODO: It would be nice to override sizeOf here and calculate the memory
-		// actually used, however at this point it seems like the reflection
-		// required would be too costly to be of any benefit. We'll just set a max
-		// object size instead.
-		sEntities = new LruCache<String, Model>(configuration.getCacheSize());
-		
-		initializeModelFillers();
+        sContext = configuration.getContext();
+        sModelInfo = new ModelInfo(configuration);
+        sDatabaseHelper = new DatabaseHelper(configuration);
 
-		openDatabase();
+        // TODO: It would be nice to override sizeOf here and calculate the memory
+        // actually used, however at this point it seems like the reflection
+        // required would be too costly to be of any benefit. We'll just set a max
+        // object size instead.
+        sEntities = new LruCache<String, Model>(configuration.getCacheSize());
 
-		sIsInitialized = true;
+        initializeModelFillers();
 
-		Log.v("ActiveAndroid initialized successfully.");
-	}
+        openDatabase();
 
-	
-	public static synchronized void clear() {
-		sEntities.evictAll();
-		Log.v("Cache cleared.");
-	}
+        sIsInitialized = true;
 
-	public static synchronized void dispose() {
-		closeDatabase();
+        Log.v("ActiveAndroid initialized successfully.");
+    }
 
-		sEntities = null;
-		sModelInfo = null;
-		sDatabaseHelper = null;
 
-		sIsInitialized = false;
+    public static synchronized void clear()
+    {
+        sEntities.evictAll();
+        Log.v("Cache cleared.");
+    }
 
-		Log.v("ActiveAndroid disposed. Call initialize to use library.");
-	}
+    public static synchronized void dispose()
+    {
+        closeDatabase();
 
-	// Database access
-	
-	public static boolean isInitialized() {
-		return sIsInitialized;
-	}
+        sEntities = null;
+        sModelInfo = null;
+        sDatabaseHelper = null;
 
-	public static synchronized SQLiteDatabase openDatabase() {
-		return sDatabaseHelper.getWritableDatabase();
-	}
+        sIsInitialized = false;
 
-	public static synchronized void closeDatabase() {
-		if (sDatabaseHelper != null) {
-			sDatabaseHelper.close();
-		}
-	}
+        Log.v("ActiveAndroid disposed. Call initialize to use library.");
+    }
 
-	// Context access
+    // Database access
 
-	public static Context getContext() {
-		return sContext;
-	}
+    public static boolean isInitialized()
+    {
+        return sIsInitialized;
+    }
 
-	// Entity cache
+    public static synchronized SQLiteDatabase openDatabase()
+    {
+        return sDatabaseHelper.getWritableDatabase();
+    }
 
-	public static String getIdentifier(Class<? extends Model> type, Long id) {
-		return getTableName(type) + "@" + id;
-	}
+    public static synchronized void closeDatabase()
+    {
+        if (sDatabaseHelper != null)
+        {
+            sDatabaseHelper.close();
+        }
+    }
 
-	public static String getIdentifier(Model entity) {
-		return getIdentifier(entity.getClass(), entity.getId());
-	}
+    // Context access
 
-	public static synchronized void addEntity(Model entity) {
-		sEntities.put(getIdentifier(entity), entity);
-	}
+    public static Context getContext()
+    {
+        return sContext;
+    }
 
-	public static synchronized Model getEntity(Class<? extends Model> type, long id) {
-		return sEntities.get(getIdentifier(type, id));
-	}
+    // Entity cache
 
-	public static synchronized void removeEntity(Model entity) {
-		sEntities.remove(getIdentifier(entity));
-	}
+    public static String getIdentifier(Class<? extends Model> type, Long id)
+    {
+        return getTableName(type) + "@" + id;
+    }
 
-	// Model cache
+    public static String getIdentifier(Model entity)
+    {
+        return getIdentifier(entity.getClass(), entity.getId());
+    }
 
-	public static synchronized Collection<TableInfo> getTableInfos() {
-		return sModelInfo.getTableInfos();
-	}
+    public static synchronized void addEntity(Model entity)
+    {
+        sEntities.put(getIdentifier(entity), entity);
+    }
 
-	public static synchronized TableInfo getTableInfo(Class<? extends Model> type) {
-		return sModelInfo.getTableInfo(type);
-	}
+    public static synchronized Model getEntity(Class<? extends Model> type, long id)
+    {
+        return sEntities.get(getIdentifier(type, id));
+    }
 
-	public static synchronized TypeSerializer getParserForType(Class<?> type) {
-		return sModelInfo.getTypeSerializer(type);
-	}
+    public static synchronized void removeEntity(Model entity)
+    {
+        sEntities.remove(getIdentifier(entity));
+    }
 
-	public static synchronized String getTableName(Class<? extends Model> type) {
-		return sModelInfo.getTableInfo(type).getTableName();
-	}
-	
-	static ModelFiller getFiller(Class<? extends Model> type) {
-		return sFillers.get(type);
-	}
-	
-	private static void initializeModelFillers() {
-		sFillers = new HashMap<Class<? extends Model>, ModelFiller>();
-		for (TableInfo tableInfo : sModelInfo.getTableInfos()) {
-			try {
-				Class<? extends Model> type = tableInfo.getType(); 
-				if (!isDoNotGenerate(type))
-					sFillers.put(type, instantiateFiller(type));
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
-			} catch (InstantiationException e) {
-				throw new RuntimeException(e);
-			}
-		}
-		
-		
-	}
-	
-	private static boolean isDoNotGenerate(Class<?> clazz) {
-		if (clazz.isAnnotationPresent(DoNotGenerate.class))
-			return true;
-		if (clazz.getSuperclass() != null)
-			return isDoNotGenerate(clazz.getSuperclass());
-		return false;
-	}
-	
-	@SuppressWarnings("unchecked")
-	private static ModelFiller instantiateFiller(Class<? extends Model> type) throws IllegalAccessException, InstantiationException {
-		ModelFiller modelFiller = sFillers.get(type);
-		if (modelFiller == null) {
-			String fillerClassName = type.getName() + ModelFiller.SUFFIX;
-			try {
-				Class<? extends ModelFiller> fillerType = (Class<? extends ModelFiller>) Class.forName(fillerClassName);
-				modelFiller = fillerType.newInstance();
-			} catch (ClassNotFoundException e) {
-				modelFiller = new EmptyModelFiller();
-			}
-			if (type.getSuperclass() != null && ReflectionUtils.isModel(type.getSuperclass())) {
-				modelFiller.superModelFiller = instantiateFiller((Class<? extends Model>) type.getSuperclass());
-			}
-		}
-		return modelFiller;
-	}
+    // Model cache
+
+    public static synchronized Collection<TableInfo> getTableInfos()
+    {
+        return sModelInfo.getTableInfos();
+    }
+
+    public static synchronized TableInfo getTableInfo(Class<? extends Model> type)
+    {
+        return sModelInfo.getTableInfo(type);
+    }
+
+    public static synchronized TypeSerializer getParserForType(Class<?> type)
+    {
+        return sModelInfo.getTypeSerializer(type);
+    }
+
+    public static synchronized String getTableName(Class<? extends Model> type)
+    {
+        return sModelInfo.getTableInfo(type).getTableName();
+    }
+
+    static ModelFiller getFiller(Class<? extends Model> type)
+    {
+        return sFillers.get(type);
+    }
+
+    private static void initializeModelFillers()
+    {
+        sFillers = new HashMap<Class<? extends Model>, ModelFiller>();
+        for (TableInfo tableInfo : sModelInfo.getTableInfos())
+        {
+            try
+            {
+                Class<? extends Model> type = tableInfo.getType();
+                if (!isDoNotGenerate(type))
+                {
+                    sFillers.put(type, instantiateFiller(type));
+                }
+            }
+            catch (IllegalAccessException e)
+            {
+                throw new RuntimeException(e);
+            }
+            catch (InstantiationException e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
+
+
+    }
+
+    private static boolean isDoNotGenerate(Class<?> clazz)
+    {
+        if (clazz.isAnnotationPresent(DoNotGenerate.class))
+        {
+            return true;
+        }
+        if (clazz.getSuperclass() != null)
+        {
+            return isDoNotGenerate(clazz.getSuperclass());
+        }
+        return false;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ModelFiller instantiateFiller(Class<? extends Model> type) throws IllegalAccessException, InstantiationException
+    {
+        ModelFiller modelFiller = sFillers.get(type);
+        if (modelFiller == null)
+        {
+            String fillerClassName = type.getName() + ModelFiller.SUFFIX;
+            try
+            {
+                Class<? extends ModelFiller> fillerType = (Class<? extends ModelFiller>) Class.forName(fillerClassName);
+                modelFiller = fillerType.newInstance();
+            }
+            catch (ClassNotFoundException e)
+            {
+                modelFiller = new EmptyModelFiller();
+            }
+            if (type.getSuperclass() != null && ReflectionUtils.isModel(type.getSuperclass()))
+            {
+                modelFiller.superModelFiller = instantiateFiller((Class<? extends Model>) type.getSuperclass());
+            }
+        }
+        return modelFiller;
+    }
 }

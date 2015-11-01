@@ -20,21 +20,26 @@ import android.test.ApplicationTestCase;
 
 import com.activeandroid.sebbia.app.Application;
 
-public abstract class ActiveAndroidTestCase extends ApplicationTestCase<Application> {
-	public ActiveAndroidTestCase() {
-		super(Application.class);
-	}
+public abstract class ActiveAndroidTestCase extends ApplicationTestCase<Application>
+{
+    public ActiveAndroidTestCase()
+    {
+        super(Application.class);
+    }
 
-	protected void setUp() throws Exception {
-		super.setUp();
-		createApplication();
-	}
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+        createApplication();
+    }
 
-	public static <T> void assertArrayEquals(T[] actual, T... expected) {
-		assertEquals(expected.length, actual.length);
-		
-		for (int i = 0; i < expected.length; i++) {
-			assertEquals(expected[i], actual[i]);
-		}
-	}
+    public static <T> void assertArrayEquals(T[] actual, T... expected)
+    {
+        assertEquals(expected.length, actual.length);
+
+        for (int i = 0; i < expected.length; i++)
+        {
+            assertEquals(expected[i], actual[i]);
+        }
+    }
 }

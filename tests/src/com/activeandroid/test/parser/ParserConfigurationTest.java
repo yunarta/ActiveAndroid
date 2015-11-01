@@ -9,14 +9,17 @@ import com.activeandroid.sebbia.DatabaseHelper;
 import com.activeandroid.test.ActiveAndroidTestCase;
 
 
-public class ParserConfigurationTest extends ActiveAndroidTestCase {
+public class ParserConfigurationTest extends ActiveAndroidTestCase
+{
 
     /**
      * Should try to use the legacy parser by default, which is be unable to handle the SQL script.
      */
-    public void testLegacyMigration() {
+    public void testLegacyMigration()
+    {
 
-        try {
+        try
+        {
             Configuration configuration = new Configuration.Builder(getContext())
                     .setDatabaseName("migration.db")
                     .setDatabaseVersion(2)
@@ -28,7 +31,9 @@ public class ParserConfigurationTest extends ActiveAndroidTestCase {
 
             fail("Should not be able to parse the SQL script.");
 
-        } catch (SQLException e) {
+        }
+        catch (SQLException e)
+        {
             final String message = e.getMessage();
 
             assertNotNull(message);
@@ -40,7 +45,8 @@ public class ParserConfigurationTest extends ActiveAndroidTestCase {
     /**
      * Should use the new parser if configured to do so.
      */
-    public void testDelimitedMigration() {
+    public void testDelimitedMigration()
+    {
         Configuration configuration = new Configuration.Builder(getContext())
                 .setSqlParser(Configuration.SQL_PARSER_DELIMITED)
                 .setDatabaseName("migration.db")
@@ -48,7 +54,7 @@ public class ParserConfigurationTest extends ActiveAndroidTestCase {
                 .create();
 
         DatabaseHelper helper = new DatabaseHelper(configuration);
-        SQLiteDatabase db = helper.getWritableDatabase();
+        SQLiteDatabase db     = helper.getWritableDatabase();
         helper.onUpgrade(db, 1, 2);
     }
 }

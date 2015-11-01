@@ -18,16 +18,20 @@ package com.activeandroid.sebbia.query;
 
 import com.activeandroid.sebbia.Model;
 
-public final class Delete implements Sqlable {
-	public Delete() {
-	}
+public final class Delete implements Sqlable
+{
+    public Delete()
+    {
+    }
 
-	public From from(Class<? extends Model> table) {
-		return new From(table, this);
-	}
+    public From from(Class<? extends Model> table)
+    {
+        return new From(table, this);
+    }
 
-	@Override
-	public String toSql() {
-		return "DELETE ";
-	}
+    @Override
+    public String toSql()
+    {
+        return "DELETE ";
+    }
 }

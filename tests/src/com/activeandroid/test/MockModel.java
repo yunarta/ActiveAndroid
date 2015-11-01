@@ -23,7 +23,8 @@ import com.activeandroid.sebbia.annotation.Column;
 import com.activeandroid.sebbia.annotation.Table;
 
 @Table(name = "MockModel")
-public class MockModel extends Model {
+public class MockModel extends Model
+{
     @Column
     public Date dateField;
 
