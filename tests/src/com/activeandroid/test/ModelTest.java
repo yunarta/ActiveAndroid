@@ -16,19 +16,19 @@
 
 package com.activeandroid.test;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import com.activeandroid.sebbia.Cache;
 import com.activeandroid.sebbia.Model;
 import com.activeandroid.sebbia.TableInfo;
 import com.activeandroid.sebbia.annotation.Column;
 import com.activeandroid.sebbia.annotation.Table;
 import com.activeandroid.sebbia.query.Select;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Simple test now covering equals and hashcode methods.
@@ -88,9 +88,9 @@ public class ModelTest extends ActiveAndroidTestCase
         MockModel model2 = new MockModel();
         MockModel model3;
 
-        model1.save();
-        model2.save();
-        model3 = Model.load(MockModel.class, model1.getId());
+        model1.save("test");
+        model2.save("test");
+        model3 = Model.load("test", MockModel.class, model1.getId());
 
         // Not equal to each other.
         assertFalse(model1.equals(model2));
@@ -136,9 +136,9 @@ public class ModelTest extends ActiveAndroidTestCase
         Model      m2  = new MockModel();
         Model      m3;
 
-        m1.save();
-        m2.save();
-        m3 = Model.load(MockModel.class, m1.getId());
+        m1.save("test");
+        m2.save("test");
+        m3 = Model.load("test", MockModel.class, m1.getId());
 
         assertEquals(m1.hashCode(), m3.hashCode());
         assertFalse(m1.hashCode() == m2.hashCode());
@@ -174,19 +174,19 @@ public class ModelTest extends ActiveAndroidTestCase
     {
         MockModel mockModel = new MockModel();
         mockModel.booleanField = false;
-        Long id = mockModel.save();
+        Long id = mockModel.save("test");
 
-        boolean databaseBooleanValue = MockModel.load(MockModel.class, id).booleanField;
+        boolean databaseBooleanValue = MockModel.load("test", MockModel.class, id).booleanField;
         assertEquals(false, databaseBooleanValue);
 
         // Test passing both a integer and a boolean into the where conditional.
-        assertEquals(mockModel, new Select().from(MockModel.class).where("booleanField = ?", 0).executeSingle());
+        assertEquals(mockModel, new Select().from(MockModel.class).where("booleanField = ?", 0).executeSingle("test"));
 
-        assertEquals(mockModel, new Select().from(MockModel.class).where("booleanField = ?", false).executeSingle());
+        assertEquals(mockModel, new Select().from(MockModel.class).where("booleanField = ?", false).executeSingle("test"));
 
-        assertNull(new Select().from(MockModel.class).where("booleanField = ?", 1).executeSingle());
+        assertNull(new Select().from(MockModel.class).where("booleanField = ?", 1).executeSingle("test"));
 
-        assertNull(new Select().from(MockModel.class).where("booleanField = ?", true).executeSingle());
+        assertNull(new Select().from(MockModel.class).where("booleanField = ?", true).executeSingle("test"));
     }
 
     /*
@@ -202,7 +202,7 @@ public class ModelTest extends ActiveAndroidTestCase
         parent.dateField = new Date();
         parent.doubleField = 2.0;
         parent.intField = 1;
-        parent.save();
+        parent.save("test");
 
         // the values to assign to child
         Date   dateValue   = new Date();
@@ -216,7 +216,7 @@ public class ModelTest extends ActiveAndroidTestCase
         child1.doubleField = doubleValue;
         child1.intField = intValue;
         child1.parent = parent;
-        child1.save();
+        child1.save("test");
 
         ChildMockModel child2 = new ChildMockModel();
         child2.booleanField = false;
@@ -224,7 +224,7 @@ public class ModelTest extends ActiveAndroidTestCase
         child2.doubleField = doubleValue;
         child2.intField = intValue;
         child2.parent = parent;
-        child2.save();
+        child2.save("test");
 
         // Store the ids assigned to child entities when persists
         List<Long> ids = new ArrayList<Long>();
@@ -232,7 +232,7 @@ public class ModelTest extends ActiveAndroidTestCase
         ids.add(child2.getId());
 
         // make the query with a join
-        List<ChildMockModel> result = new Select().from(ChildMockModel.class).join(ParentJoinMockModel.class).on("ParentJoinMockModel.Id = ChildMockModel.parent").execute();
+        List<ChildMockModel> result = new Select().from(ChildMockModel.class).join(ParentJoinMockModel.class).on("ParentJoinMockModel.Id = ChildMockModel.parent").execute("test");
 
         // check result
         assertNotNull(result);

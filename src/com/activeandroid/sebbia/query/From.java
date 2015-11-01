@@ -340,34 +340,34 @@ public final class From implements Sqlable
         return sqlString(sql);
     }
 
-    public <T extends Model> List<T> execute()
+    public <T extends Model> List<T> execute(String database)
     {
         if (mQueryBase instanceof Select)
         {
-            return SQLiteUtils.rawQuery(mType, toSql(), getArguments());
+            return SQLiteUtils.rawQuery(database, mType, toSql(), getArguments());
 
         }
         else
         {
-            SQLiteUtils.execSql(toSql(), getArguments());
+            SQLiteUtils.execSql(database, toSql(), getArguments());
             Cache.getContext().getContentResolver().notifyChange(ContentProvider.createUri(mType, null), null);
             return null;
 
         }
     }
 
-    public <T extends Model> T executeSingle()
+    public <T extends Model> T executeSingle(String database)
     {
         if (mQueryBase instanceof Select)
         {
             limit(1);
-            return (T) SQLiteUtils.rawQuerySingle(mType, toSql(), getArguments());
+            return (T) SQLiteUtils.rawQuerySingle(database, mType, toSql(), getArguments());
 
         }
         else
         {
             limit(1);
-            SQLiteUtils.rawQuerySingle(mType, toSql(), getArguments()).delete();
+            SQLiteUtils.rawQuerySingle(database, mType, toSql(), getArguments()).delete(database);
             return null;
 
         }
@@ -376,19 +376,22 @@ public final class From implements Sqlable
     /**
      * Gets a value indicating whether the query returns any rows.
      *
+     * @param database
      * @return <code>true</code> if the query returns at least one row; otherwise, <code>false</code>.
      */
-    public boolean exists()
+    public boolean exists(String database)
     {
-        return SQLiteUtils.intQuery(toExistsSql(), getArguments()) != 0;
+        return SQLiteUtils.intQuery(database, toExistsSql(), getArguments()) != 0;
     }
 
     /**
      * Gets the number of rows returned by the query.
+     *
+     * @param database
      */
-    public int count()
+    public int count(String database)
     {
-        return SQLiteUtils.intQuery(toCountSql(), getArguments());
+        return SQLiteUtils.intQuery(database, toCountSql(), getArguments());
     }
 
     public String[] getArguments()

@@ -16,17 +16,6 @@ package com.activeandroid.sebbia.util;
  * limitations under the License.
  */
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import android.database.Cursor;
 import android.os.Build;
 import android.text.TextUtils;
@@ -37,6 +26,17 @@ import com.activeandroid.sebbia.TableInfo;
 import com.activeandroid.sebbia.annotation.Column;
 import com.activeandroid.sebbia.annotation.Column.ConflictAction;
 import com.activeandroid.sebbia.serializer.TypeSerializer;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public final class SQLiteUtils
 {
@@ -97,37 +97,37 @@ public final class SQLiteUtils
     // PUBLIC METHODS
     //////////////////////////////////////////////////////////////////////////////////////
 
-    public static void execSql(String sql)
+    public static void execSql(String database, String sql)
     {
-        Cache.openDatabase().execSQL(sql);
+        Cache.openDatabase(database).execSQL(sql);
     }
 
-    public static void execSql(String sql, Object[] bindArgs)
+    public static void execSql(String database, String sql, Object[] bindArgs)
     {
-        Cache.openDatabase().execSQL(sql, bindArgs);
+        Cache.openDatabase(database).execSQL(sql, bindArgs);
     }
 
-    public static <T extends Model> List<T> rawQuery(Class<? extends Model> type, String sql, String[] selectionArgs)
+    public static <T extends Model> List<T> rawQuery(String database, Class<? extends Model> type, String sql, String[] selectionArgs)
     {
-        Cursor  cursor   = Cache.openDatabase().rawQuery(sql, selectionArgs);
-        List<T> entities = processCursor(type, cursor);
+        Cursor  cursor   = Cache.openDatabase(database).rawQuery(sql, selectionArgs);
+        List<T> entities = processCursor(database, type, cursor);
         cursor.close();
 
         return entities;
     }
 
-    public static int intQuery(final String sql, final String[] selectionArgs)
+    public static int intQuery(String database, final String sql, final String[] selectionArgs)
     {
-        final Cursor cursor = Cache.openDatabase().rawQuery(sql, selectionArgs);
+        final Cursor cursor = Cache.openDatabase(database).rawQuery(sql, selectionArgs);
         final int    number = processIntCursor(cursor);
         cursor.close();
 
         return number;
     }
 
-    public static <T extends Model> T rawQuerySingle(Class<? extends Model> type, String sql, String[] selectionArgs)
+    public static <T extends Model> T rawQuerySingle(String database, Class<? extends Model> type, String sql, String[] selectionArgs)
     {
-        List<T> entities = rawQuery(type, sql, selectionArgs);
+        List<T> entities = rawQuery(database, type, sql, selectionArgs);
 
         if (entities.size() > 0)
         {
@@ -423,7 +423,7 @@ public final class SQLiteUtils
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends Model> List<T> processCursor(Class<? extends Model> type, Cursor cursor)
+    public static <T extends Model> List<T> processCursor(String database, Class<? extends Model> type, Cursor cursor)
     {
         TableInfo     tableInfo = Cache.getTableInfo(type);
         String        idName    = tableInfo.getIdName();
@@ -448,7 +448,7 @@ public final class SQLiteUtils
                         entity = (T) entityConstructor.newInstance();
                     }
 
-                    entity.loadFromCursor(cursor);
+                    entity.loadFromCursor(database, cursor);
                     entities.add((T) entity);
                 }
                 while (cursor.moveToNext());

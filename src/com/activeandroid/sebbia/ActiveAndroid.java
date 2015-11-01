@@ -64,38 +64,38 @@ public final class ActiveAndroid
         Log.setEnabled(enabled);
     }
 
-    public static SQLiteDatabase getDatabase()
+    public static SQLiteDatabase getDatabase(String database)
     {
-        return Cache.openDatabase();
+        return Cache.openDatabase(database);
     }
 
-    public static void beginTransaction()
+    public static void beginTransaction(String database)
     {
-        Cache.openDatabase().beginTransaction();
+        Cache.openDatabase(database).beginTransaction();
     }
 
-    public static void endTransaction()
+    public static void endTransaction(String database)
     {
-        Cache.openDatabase().endTransaction();
+        Cache.openDatabase(database).endTransaction();
     }
 
-    public static void setTransactionSuccessful()
+    public static void setTransactionSuccessful(String database)
     {
-        Cache.openDatabase().setTransactionSuccessful();
+        Cache.openDatabase(database).setTransactionSuccessful();
     }
 
-    public static boolean inTransaction()
+    public static boolean inTransaction(String database)
     {
-        return Cache.openDatabase().inTransaction();
+        return Cache.openDatabase(database).inTransaction();
     }
 
-    public static void execSQL(String sql)
+    public static void execSQL(String sql, String database)
     {
-        Cache.openDatabase().execSQL(sql);
+        Cache.openDatabase(database).execSQL(sql);
     }
 
-    public static void execSQL(String sql, Object[] bindArgs)
+    public static void execSQL(String sql, Object[] bindArgs, String database)
     {
-        Cache.openDatabase().execSQL(sql, bindArgs);
+        Cache.openDatabase(database).execSQL(sql, bindArgs);
     }
 }

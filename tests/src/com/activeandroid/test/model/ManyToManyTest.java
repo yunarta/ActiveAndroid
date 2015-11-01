@@ -1,11 +1,11 @@
 package com.activeandroid.test.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.activeandroid.sebbia.Model;
 import com.activeandroid.sebbia.model.ManyToManyRelation;
 import com.activeandroid.test.MockModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ManyToManyTest extends ModelTestCase
 {
@@ -38,14 +38,14 @@ public class ManyToManyTest extends ModelTestCase
         for (int i = 0; i < 3; ++i)
         {
             MockModelList mockModelList = new MockModelList();
-            mockModelList.save();
-            ManyToManyRelation.setRelationsFront(MockManyToManyRelation.class, mockModelList, mockModels);
+            mockModelList.save("test");
+            ManyToManyRelation.setRelationsFront("test", MockManyToManyRelation.class, mockModelList, mockModels);
             mockModelLists.add(mockModelList);
         }
 
         for (MockModelList list : mockModelLists)
         {
-            verifyMockModels(ManyToManyRelation.getRelationsFront(MockManyToManyRelation.class, list), MockModel.class);
+            verifyMockModels(ManyToManyRelation.getRelationsFront("test", MockManyToManyRelation.class, list), MockModel.class);
         }
     }
 
@@ -56,13 +56,13 @@ public class ManyToManyTest extends ModelTestCase
         for (int i = 0; i < 3; ++i)
         {
             MockModel mockModel = new MockModel();
-            mockModel.save();
-            ManyToManyRelation.setRelationsReverse(MockManyToManyRelation.class, mockModel, mockModelLists);
+            mockModel.save("test");
+            ManyToManyRelation.setRelationsReverse("test", MockManyToManyRelation.class, mockModel, mockModelLists);
             mockModels.add(mockModel);
         }
         for (MockModel mockModel : mockModels)
         {
-            verifyMockModels(ManyToManyRelation.getRelationsReverse(MockManyToManyRelation.class, mockModel), MockModelList.class);
+            verifyMockModels(ManyToManyRelation.getRelationsReverse("test", MockManyToManyRelation.class, mockModel), MockModelList.class);
         }
     }
 
@@ -85,7 +85,7 @@ public class ManyToManyTest extends ModelTestCase
         {
             MockModel mockModel = clazz.newInstance();
             mockModel.intField = i;
-            mockModel.save();
+            mockModel.save("test");
             mockModels.add((T) mockModel);
         }
         return mockModels;

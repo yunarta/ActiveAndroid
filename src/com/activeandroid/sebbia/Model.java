@@ -16,11 +16,6 @@ package com.activeandroid.sebbia;
  * limitations under the License.
  */
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -36,6 +31,11 @@ import com.activeandroid.sebbia.query.Select;
 import com.activeandroid.sebbia.serializer.TypeSerializer;
 import com.activeandroid.sebbia.util.Log;
 import com.activeandroid.sebbia.util.ReflectionUtils;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @SuppressWarnings("unchecked")
 public abstract class Model
@@ -74,18 +74,18 @@ public abstract class Model
         return mId;
     }
 
-    public final void delete()
+    public final void delete(String database)
     {
-        Cache.openDatabase().delete(mTableInfo.getTableName(), idName + "=?", new String[]{getId().toString()});
+        Cache.openDatabase(database).delete(mTableInfo.getTableName(), idName + "=?", new String[]{getId().toString()});
         Cache.removeEntity(this);
 
         Cache.getContext().getContentResolver()
                 .notifyChange(ContentProvider.createUri(mTableInfo.getType(), mId), null);
     }
 
-    public final Long save()
+    public final Long save(String database)
     {
-        SQLiteDatabase db     = Cache.openDatabase();
+        SQLiteDatabase db     = Cache.openDatabase(database);
         ContentValues  values = new ContentValues();
         fillContentValues(this, values);
 
@@ -105,26 +105,26 @@ public abstract class Model
 
     // Convenience methods
 
-    public static void delete(Class<? extends Model> type, long id)
+    public static void delete(String database, Class<? extends Model> type, long id)
     {
         TableInfo tableInfo = Cache.getTableInfo(type);
-        new Delete().from(type).where(tableInfo.getIdName() + "=?", id).execute();
+        new Delete().from(type).where(tableInfo.getIdName() + "=?", id).execute(database);
     }
 
-    public static <T extends Model> T load(Class<T> type, long id)
+    public static <T extends Model> T load(String database, Class<T> type, long id)
     {
         T model = (T) Cache.getEntity(type, id);
         if (model == null)
         {
             TableInfo tableInfo = Cache.getTableInfo(type);
-            model = new Select().from(type).where(tableInfo.getIdName() + "=?", id).executeSingle();
+            model = new Select().from(type).where(tableInfo.getIdName() + "=?", id).executeSingle(database);
         }
         return model;
     }
 
-    public static void saveMultiple(List<? extends Model> entities)
+    public static void saveMultiple(String database, List<? extends Model> entities)
     {
-        final SQLiteDatabase db     = Cache.openDatabase();
+        final SQLiteDatabase db     = Cache.openDatabase(database);
         final ContentValues  values = new ContentValues();
         for (Model entity : entities)
         {
@@ -136,7 +136,7 @@ public abstract class Model
                 {
                     synchronized (entity.getClass())
                     {
-                        SQLiteStatement statement = entity.mTableInfo.getInsertOrReplaceStatement();
+                        SQLiteStatement statement = entity.mTableInfo.getInsertOrReplaceStatement(database);
                         statement.clearBindings();
                         filler.bindStatement(entity, statement, entity.mTableInfo.getColumnIndexes());
                         entity.mId = statement.executeInsert();
@@ -158,7 +158,7 @@ public abstract class Model
 
     // Model population
 
-    public final void loadFromCursor(Cursor cursor)
+    public final void loadFromCursor(String database, Cursor cursor)
     {
         ModelFiller filler = Cache.getFiller(mTableInfo.getType());
         if (filler != null)
@@ -167,7 +167,7 @@ public abstract class Model
         }
         else
         {
-            loadFromCursorReflective(cursor);
+            loadFromCursorReflective(database, cursor);
         }
         if (mId != null)
         {
@@ -310,7 +310,7 @@ public abstract class Model
         filler.loadFromCursor(this, cursor);
     }
 
-    private void loadFromCursorReflective(Cursor cursor)
+    private void loadFromCursorReflective(String database, Cursor cursor)
     {
         /**
          * Obtain the columns ordered to fix issue #106
@@ -355,7 +355,7 @@ public abstract class Model
                 {
                     if (ReflectionUtils.isModel(fieldType))
                     {
-                        value = ModelHelper.getModel(cursor, fieldType, columnIndex);
+                        value = ModelHelper.getModel(database, cursor, fieldType, columnIndex);
                     }
                     else if (ReflectionUtils.isSubclassOf(fieldType, Enum.class))
                     {
@@ -395,9 +395,9 @@ public abstract class Model
     // PROTECTED METHODS
     // ////////////////////////////////////////////////////////////////////////////////////
 
-    protected final <T extends Model> List<T> getMany(Class<T> type, String foreignKey)
+    protected final <T extends Model> List<T> getMany(String database, Class<T> type, String foreignKey)
     {
-        return new Select().from(type).where(Cache.getTableName(type) + "." + foreignKey + "=?", getId()).execute();
+        return new Select().from(type).where(Cache.getTableName(type) + "." + foreignKey + "=?", getId()).execute(database);
     }
 
     protected String getIdName()

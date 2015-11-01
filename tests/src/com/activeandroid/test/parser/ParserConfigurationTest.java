@@ -25,7 +25,7 @@ public class ParserConfigurationTest extends ActiveAndroidTestCase
                     .setDatabaseVersion(2)
                     .create();
 
-            DatabaseHelper helper = new DatabaseHelper(configuration);
+            DatabaseHelper helper = new DatabaseHelper(configuration.getContext(), configuration.getDatabaseName(), configuration.getDatabaseVersion(), configuration.getSqlParser());
             SQLiteDatabase db = helper.getWritableDatabase();
             helper.onUpgrade(db, 1, 2);
 
@@ -53,7 +53,7 @@ public class ParserConfigurationTest extends ActiveAndroidTestCase
                 .setDatabaseVersion(2)
                 .create();
 
-        DatabaseHelper helper = new DatabaseHelper(configuration);
+        DatabaseHelper helper = new DatabaseHelper(configuration.getContext(), configuration.getDatabaseName(), configuration.getDatabaseVersion(), configuration.getSqlParser());
         SQLiteDatabase db     = helper.getWritableDatabase();
         helper.onUpgrade(db, 1, 2);
     }

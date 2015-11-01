@@ -16,13 +16,10 @@ package com.activeandroid.sebbia;
  * limitations under the License.
  */
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.util.LruCache;
+import android.util.SparseArray;
 
 import com.activeandroid.sebbia.annotation.DoNotGenerate;
 import com.activeandroid.sebbia.internal.EmptyModelFiller;
@@ -30,6 +27,10 @@ import com.activeandroid.sebbia.internal.ModelFiller;
 import com.activeandroid.sebbia.serializer.TypeSerializer;
 import com.activeandroid.sebbia.util.Log;
 import com.activeandroid.sebbia.util.ReflectionUtils;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public final class Cache
 {
@@ -45,14 +46,17 @@ public final class Cache
 
     private static Context sContext;
 
-    private static ModelInfo      sModelInfo;
-    private static DatabaseHelper sDatabaseHelper;
+    private static ModelInfo sModelInfo;
+
+    private static SparseArray<DatabaseHelper> sDatabaseHelper;
 
     private static LruCache<String, Model> sEntities;
 
     private static boolean sIsInitialized = false;
 
     private static Map<Class<? extends Model>, ModelFiller> sFillers;
+    private static int                                      sVersion;
+    private static String                                   sSqlParser;
 
     //////////////////////////////////////////////////////////////////////////////////////
     // CONSTRUCTORS
@@ -76,7 +80,12 @@ public final class Cache
 
         sContext = configuration.getContext();
         sModelInfo = new ModelInfo(configuration);
-        sDatabaseHelper = new DatabaseHelper(configuration);
+
+        sVersion = configuration.getDatabaseVersion();
+        sSqlParser = configuration.getSqlParser();
+
+        sDatabaseHelper = new SparseArray<DatabaseHelper>();
+        // sDatabaseHelper = new DatabaseHelper(configuration.getContext(), configuration.getDatabaseName(), sVersion, sSqlParser);
 
         // TODO: It would be nice to override sizeOf here and calculate the memory
         // actually used, however at this point it seems like the reflection
@@ -86,7 +95,7 @@ public final class Cache
 
         initializeModelFillers();
 
-        openDatabase();
+        // openDatabase(database.hashCode());
 
         sIsInitialized = true;
 
@@ -102,7 +111,12 @@ public final class Cache
 
     public static synchronized void dispose()
     {
-        closeDatabase();
+        int size = sDatabaseHelper.size();
+        for (int i = 0; i < size; i++)
+        {
+            DatabaseHelper helper = sDatabaseHelper.valueAt(i);
+            helper.close();
+        }
 
         sEntities = null;
         sModelInfo = null;
@@ -120,16 +134,28 @@ public final class Cache
         return sIsInitialized;
     }
 
-    public static synchronized SQLiteDatabase openDatabase()
+    public static synchronized SQLiteDatabase openDatabase(String database)
     {
-        return sDatabaseHelper.getWritableDatabase();
+        int key = database.hashCode();
+
+        DatabaseHelper helper = sDatabaseHelper.get(key);
+        if (helper == null)
+        {
+            helper = new DatabaseHelper(sContext, database, sVersion, sSqlParser);
+            sDatabaseHelper.put(key, helper);
+        }
+
+        return helper.getWritableDatabase();
     }
 
-    public static synchronized void closeDatabase()
+    public static synchronized void closeDatabase(String database)
     {
-        if (sDatabaseHelper != null)
+        int key = database.hashCode();
+
+        DatabaseHelper helper = sDatabaseHelper.get(key);
+        if (helper != null)
         {
-            sDatabaseHelper.close();
+            helper.close();
         }
     }
 

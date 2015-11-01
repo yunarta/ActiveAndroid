@@ -1,7 +1,5 @@
 package com.activeandroid.sebbia.internal;
 
-import java.util.Map;
-
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteStatement;
@@ -13,6 +11,8 @@ import com.activeandroid.sebbia.query.Select;
 import com.activeandroid.sebbia.serializer.TypeSerializer;
 import com.activeandroid.sebbia.util.Log;
 import com.activeandroid.sebbia.util.ReflectionUtils;
+
+import java.util.Map;
 
 public class ModelHelper
 {
@@ -207,7 +207,7 @@ public class ModelHelper
     }
 
     @SuppressWarnings("unchecked")
-    public static Object getModel(Cursor cursor, Class<?> fieldType, int columnIndex)
+    public static Object getModel(String database, Cursor cursor, Class<?> fieldType, int columnIndex)
     {
         final long                   entityId   = cursor.getLong(columnIndex);
         final Class<? extends Model> entityType = (Class<? extends Model>) fieldType;
@@ -215,7 +215,7 @@ public class ModelHelper
         Model entity = Cache.getEntity(entityType, entityId);
         if (entity == null)
         {
-            entity = new Select().from(entityType).where(Cache.getTableInfo(entityType).getIdName() + "=?", entityId).executeSingle();
+            entity = new Select().from(entityType).where(Cache.getTableInfo(entityType).getIdName() + "=?", entityId).executeSingle(database);
         }
         return entity;
     }

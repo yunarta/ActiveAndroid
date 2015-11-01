@@ -1,8 +1,5 @@
 package com.activeandroid.test.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.database.Cursor;
 
 import com.activeandroid.sebbia.ActiveAndroid;
@@ -12,6 +9,9 @@ import com.activeandroid.sebbia.TableInfo;
 import com.activeandroid.sebbia.annotation.Column;
 import com.activeandroid.sebbia.annotation.Table;
 import com.activeandroid.sebbia.query.Delete;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class EnumTest extends ModelTestCase
 {
@@ -45,17 +45,17 @@ public class EnumTest extends ModelTestCase
 
     public void testEnumSaving()
     {
-        new Delete().from(EnumModel.class).execute();
+        new Delete().from(EnumModel.class).execute("test");
         List<EnumModel> models = new ArrayList<EnumModel>();
         for (Enumeration enumeration : Enumeration.values())
         {
             models.add(new EnumModel(enumeration));
         }
 
-        Model.saveMultiple(models);
+        Model.saveMultiple("test", models);
 
         TableInfo tableInfo = Cache.getTableInfo(EnumModel.class);
-        Cursor    cursor    = ActiveAndroid.getDatabase().query(tableInfo.getTableName(), new String[]{"enum"}, null, null, null, null, null);
+        Cursor    cursor    = ActiveAndroid.getDatabase("test").query(tableInfo.getTableName(), new String[]{"enum"}, null, null, null, null, null);
         while (cursor.moveToNext())
         {
             assertTrue(cursor.getString(0).equals(Enumeration.values()[cursor.getPosition()]));

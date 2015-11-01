@@ -1,11 +1,11 @@
 package com.activeandroid.test.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.activeandroid.sebbia.Model;
 import com.activeandroid.sebbia.model.OneToManyRelation;
 import com.activeandroid.test.MockModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class OneToManyTest extends ModelTestCase
 {
@@ -22,19 +22,19 @@ public class OneToManyTest extends ModelTestCase
     {
 
         MockModel mockModelsHolder = new MockModel();
-        mockModelsHolder.save();
+        mockModelsHolder.save("test");
 
         List<Model> mockModels = new ArrayList<Model>();
         for (int i = 0; i < 5; ++i)
         {
             MockModel mockModel = new MockModel();
-            mockModel.save();
+            mockModel.save("test");
             mockModels.add(mockModel);
         }
 
-        OneToManyRelation.setRelations(MockOneToManyRelation.class, mockModelsHolder, mockModels);
+        OneToManyRelation.setRelations("test", MockOneToManyRelation.class, mockModelsHolder, mockModels);
 
-        mockModels = OneToManyRelation.getRelations(MockOneToManyRelation.class, mockModelsHolder);
+        mockModels = OneToManyRelation.getRelations("test", MockOneToManyRelation.class, mockModelsHolder);
         assertTrue(mockModels.size() == 5);
     }
 }

@@ -1,7 +1,5 @@
 package com.activeandroid.test;
 
-import java.util.List;
-
 import android.app.Application;
 import android.test.ApplicationTestCase;
 
@@ -11,6 +9,8 @@ import com.activeandroid.sebbia.Model;
 import com.activeandroid.sebbia.annotation.Column;
 import com.activeandroid.sebbia.annotation.Table;
 import com.activeandroid.sebbia.query.Select;
+
+import java.util.List;
 
 public class DefaultValueTest extends ApplicationTestCase<Application>
 {
@@ -71,7 +71,7 @@ public class DefaultValueTest extends ApplicationTestCase<Application>
     public void testDefaultValueInteger()
     {
         initializedActiveAndroid(IntegerDefaultValueModel.class);
-        List<IntegerDefaultValueModel> models = insertAndSelectModels(IntegerDefaultValueModel.class);
+        List<IntegerDefaultValueModel> models = insertAndSelectModels("test", IntegerDefaultValueModel.class);
         for (IntegerDefaultValueModel model : models)
         {
             assertEquals(Integer.valueOf(20), model.defaultField);
@@ -81,7 +81,7 @@ public class DefaultValueTest extends ApplicationTestCase<Application>
     public void testDefaultValueBoolean()
     {
         initializedActiveAndroid(BooleanDefaultValueModel.class);
-        List<BooleanDefaultValueModel> models = insertAndSelectModels(BooleanDefaultValueModel.class);
+        List<BooleanDefaultValueModel> models = insertAndSelectModels("test", BooleanDefaultValueModel.class);
         for (BooleanDefaultValueModel model : models)
         {
             assertEquals(Boolean.valueOf(true), model.defaultField);
@@ -91,7 +91,7 @@ public class DefaultValueTest extends ApplicationTestCase<Application>
     public void testDefaultValueString()
     {
         initializedActiveAndroid(StringDefaultValueModel.class);
-        List<StringDefaultValueModel> models = insertAndSelectModels(StringDefaultValueModel.class);
+        List<StringDefaultValueModel> models = insertAndSelectModels("test", StringDefaultValueModel.class);
         assertNotNull(models);
         for (StringDefaultValueModel model : models)
         {
@@ -99,7 +99,7 @@ public class DefaultValueTest extends ApplicationTestCase<Application>
         }
     }
 
-    private <T extends Model> List<T> insertAndSelectModels(Class<T> clazz)
+    private <T extends Model> List<T> insertAndSelectModels(String database, Class<T> clazz)
     {
         for (int i = 0; i < COUNT; ++i)
         {
@@ -112,10 +112,10 @@ public class DefaultValueTest extends ApplicationTestCase<Application>
             {
                 throw new RuntimeException(e);
             }
-            model.save();
+            model.save(database);
         }
 
-        List<T> models = new Select().from(clazz).execute();
+        List<T> models = new Select().from(clazz).execute(database);
         assertEquals(COUNT, models.size());
         return models;
     }

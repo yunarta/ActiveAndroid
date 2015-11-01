@@ -88,9 +88,9 @@ public final class Set implements Sqlable
         return sql.toString();
     }
 
-    public void execute()
+    public void execute(String database)
     {
-        SQLiteUtils.execSql(toSql(), getArguments());
+        SQLiteUtils.execSql(database, toSql(), getArguments());
     }
 
     public String[] getArguments()

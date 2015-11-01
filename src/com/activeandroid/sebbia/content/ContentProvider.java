@@ -1,8 +1,5 @@
 package com.activeandroid.sebbia.content;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -14,6 +11,9 @@ import com.activeandroid.sebbia.Cache;
 import com.activeandroid.sebbia.Configuration;
 import com.activeandroid.sebbia.Model;
 import com.activeandroid.sebbia.TableInfo;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ContentProvider extends android.content.ContentProvider
 {
@@ -50,11 +50,11 @@ public class ContentProvider extends android.content.ContentProvider
             final int itemKey = (i * 2) + 2;
 
             // content://<authority>/<table>
-            URI_MATCHER.addURI(sAuthority, tableInfo.getTableName().toLowerCase(), tableKey);
+            URI_MATCHER.addURI(sAuthority, "*/" + tableInfo.getTableName().toLowerCase(), tableKey);
             TYPE_CODES.put(tableKey, tableInfo.getType());
 
             // content://<authority>/<table>/<id>
-            URI_MATCHER.addURI(sAuthority, tableInfo.getTableName().toLowerCase() + "/#", itemKey);
+            URI_MATCHER.addURI(sAuthority, "*/" + tableInfo.getTableName().toLowerCase() + "/#", itemKey);
             TYPE_CODES.put(itemKey, tableInfo.getType());
         }
 
@@ -98,8 +98,10 @@ public class ContentProvider extends android.content.ContentProvider
     @Override
     public Uri insert(Uri uri, ContentValues values)
     {
-        final Class<? extends Model> type = getModelType(uri);
-        final Long                   id   = Cache.openDatabase().insert(Cache.getTableName(type), null, values);
+        final Class<? extends Model> type    = getModelType(uri);
+        String                       database = getDatabase(uri);
+
+        final Long id = Cache.openDatabase(database).insert(Cache.getTableName(type), null, values);
 
         if (id != null && id > 0)
         {
@@ -115,8 +117,10 @@ public class ContentProvider extends android.content.ContentProvider
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs)
     {
-        final Class<? extends Model> type  = getModelType(uri);
-        final int                    count = Cache.openDatabase().update(Cache.getTableName(type), values, selection, selectionArgs);
+        final Class<? extends Model> type    = getModelType(uri);
+        String                       database = getDatabase(uri);
+
+        final int count = Cache.openDatabase(database).update(Cache.getTableName(type), values, selection, selectionArgs);
 
         notifyChange(uri);
 
@@ -126,8 +130,9 @@ public class ContentProvider extends android.content.ContentProvider
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs)
     {
-        final Class<? extends Model> type  = getModelType(uri);
-        final int                    count = Cache.openDatabase().delete(Cache.getTableName(type), selection, selectionArgs);
+        final Class<? extends Model> type    = getModelType(uri);
+        String                       database = getDatabase(uri);
+        final int                    count   = Cache.openDatabase(database).delete(Cache.getTableName(type), selection, selectionArgs);
 
         notifyChange(uri);
 
@@ -137,8 +142,10 @@ public class ContentProvider extends android.content.ContentProvider
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder)
     {
-        final Class<? extends Model> type = getModelType(uri);
-        final Cursor cursor = Cache.openDatabase().query(
+        final Class<? extends Model> type    = getModelType(uri);
+        String                       database = getDatabase(uri);
+
+        final Cursor cursor = Cache.openDatabase(database).query(
                 Cache.getTableName(type),
                 projection,
                 selection,
@@ -200,6 +207,12 @@ public class ContentProvider extends android.content.ContentProvider
         }
 
         return null;
+    }
+
+    private String getDatabase(Uri uri)
+    {
+        List<String> segments = uri.getPathSegments();
+        return segments.get(0);
     }
 
     private void notifyChange(Uri uri)

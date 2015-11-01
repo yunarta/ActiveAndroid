@@ -1,7 +1,5 @@
 package com.activeandroid.test.automigration;
 
-import java.util.List;
-
 import android.database.Cursor;
 
 import com.activeandroid.sebbia.ActiveAndroid;
@@ -9,6 +7,8 @@ import com.activeandroid.sebbia.Model;
 import com.activeandroid.sebbia.annotation.Column;
 import com.activeandroid.sebbia.annotation.Table;
 import com.activeandroid.sebbia.query.Select;
+
+import java.util.List;
 
 public class AddUniqueNotNullTest extends AutoMigrationTest
 {
@@ -40,7 +40,7 @@ public class AddUniqueNotNullTest extends AutoMigrationTest
     {
         createOldDatabase();
         initializeActiveAndroid(AddUniqueMigrationModel.class);
-        List<AddUniqueMigrationModel> migrationModels = new Select().from(AddUniqueMigrationModel.class).execute();
+        List<AddUniqueMigrationModel> migrationModels = new Select().from(AddUniqueMigrationModel.class).execute("test");
         assertEquals(10, migrationModels.size());
         for (int i = 0; i < 10; ++i)
         {
@@ -51,7 +51,7 @@ public class AddUniqueNotNullTest extends AutoMigrationTest
             assertEquals((float) i, migrationModel.floatValue);
         }
 
-        Cursor cursor = ActiveAndroid.getDatabase().query(TABLE, null, null, null, null, null, null);
+        Cursor cursor = ActiveAndroid.getDatabase("test").query(TABLE, null, null, null, null, null, null);
         assertTrue(cursor.getColumnIndex("unusedColumn") == -1);
     }
 

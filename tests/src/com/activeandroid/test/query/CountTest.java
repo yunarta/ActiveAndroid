@@ -1,12 +1,12 @@
 
 package com.activeandroid.test.query;
 
-import java.util.List;
-
 import com.activeandroid.sebbia.query.Delete;
 import com.activeandroid.sebbia.query.From;
 import com.activeandroid.sebbia.query.Select;
 import com.activeandroid.test.MockModel;
+
+import java.util.List;
 
 
 public class CountTest extends SqlableTestCase
@@ -14,7 +14,7 @@ public class CountTest extends SqlableTestCase
 
     private void cleanTable()
     {
-        new Delete().from(MockModel.class).execute();
+        new Delete().from(MockModel.class).execute("test");
     }
 
     private void populateTable()
@@ -27,9 +27,9 @@ public class CountTest extends SqlableTestCase
         m2.intField = 1;
         m3.intField = 2;
 
-        m1.save();
-        m2.save();
-        m3.save();
+        m1.save("test");
+        m2.save("test");
+        m3.save("test");
     }
 
     /**
@@ -90,8 +90,8 @@ public class CountTest extends SqlableTestCase
         From from = new Select()
                 .from(MockModel.class);
 
-        final List<MockModel> list  = from.execute();
-        final int             count = from.count();
+        final List<MockModel> list  = from.execute("test");
+        final int             count = from.count("test");
 
         assertEquals(3, count);
         assertEquals(list.size(), count);
@@ -110,8 +110,8 @@ public class CountTest extends SqlableTestCase
                 .from(MockModel.class)
                 .where("intField = ?", 1);
 
-        final List<MockModel> list  = from.execute();
-        final int             count = from.count();
+        final List<MockModel> list  = from.execute("test");
+        final int             count = from.count("test");
 
         assertEquals(2, count);
         assertEquals(list.size(), count);
@@ -130,8 +130,8 @@ public class CountTest extends SqlableTestCase
                 .from(MockModel.class)
                 .where("intField = ?", 3);
 
-        final List<MockModel> list  = from.execute();
-        final int             count = from.count();
+        final List<MockModel> list  = from.execute("test");
+        final int             count = from.count("test");
 
         assertEquals(0, count);
         assertEquals(list.size(), count);
@@ -150,8 +150,8 @@ public class CountTest extends SqlableTestCase
                 .where("intField = ?", 1)
                 .orderBy("intField ASC");
 
-        final List<MockModel> list  = from.execute();
-        final int             count = from.count();
+        final List<MockModel> list  = from.execute("test");
+        final int             count = from.count("test");
 
         assertEquals(2, count);
         assertEquals(list.size(), count);
@@ -171,8 +171,8 @@ public class CountTest extends SqlableTestCase
                 .groupBy("intField")
                 .having("intField = 1");
 
-        final List<MockModel> list  = from.execute();
-        final int             count = from.count();
+        final List<MockModel> list  = from.execute("test");
+        final int             count = from.count("test");
 
         assertEquals(2, count);
         assertEquals(1, list.size());

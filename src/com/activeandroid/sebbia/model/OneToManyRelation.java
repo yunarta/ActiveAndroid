@@ -1,8 +1,5 @@
 package com.activeandroid.sebbia.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.database.Cursor;
 
 import com.activeandroid.sebbia.Cache;
@@ -12,6 +9,9 @@ import com.activeandroid.sebbia.annotation.Column;
 import com.activeandroid.sebbia.annotation.DoNotGenerate;
 import com.activeandroid.sebbia.query.Delete;
 import com.activeandroid.sebbia.util.Log;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @DoNotGenerate
 public abstract class OneToManyRelation<T1 extends Model, T2 extends Model> extends Model
@@ -24,7 +24,7 @@ public abstract class OneToManyRelation<T1 extends Model, T2 extends Model> exte
     @Column(name = "entity2")
     private Model  entity2;
 
-    public static <T1 extends Model, T2 extends Model> void setRelations(Class<? extends OneToManyRelation<T1, T2>> relation, T1 entity1, List<T2> entities2)
+    public static <T1 extends Model, T2 extends Model> void setRelations(String database, Class<? extends OneToManyRelation<T1, T2>> relation, T1 entity1, List<T2> entities2)
     {
         if (entity1.getId() == null)
         {
@@ -38,7 +38,7 @@ public abstract class OneToManyRelation<T1 extends Model, T2 extends Model> exte
             }
         }
 
-        new Delete().from(relation).where("entity1 = ?", entity1.getId()).execute();
+        new Delete().from(relation).where("entity1 = ?", entity1.getId()).execute(database);
         try
         {
             List<OneToManyRelation<T1, T2>> connections = new ArrayList<OneToManyRelation<T1, T2>>();
@@ -50,7 +50,7 @@ public abstract class OneToManyRelation<T1 extends Model, T2 extends Model> exte
                 connection.entity2 = entity2;
                 connections.add(connection);
             }
-            saveMultiple(connections);
+            saveMultiple(database, connections);
         }
         catch (Exception e)
         {
@@ -60,7 +60,7 @@ public abstract class OneToManyRelation<T1 extends Model, T2 extends Model> exte
     }
 
     @SuppressWarnings("unchecked")
-    public static <T1 extends Model, T2 extends Model> List<T2> getRelations(Class<? extends OneToManyRelation<T1, T2>> relation, T1 entity)
+    public static <T1 extends Model, T2 extends Model> List<T2> getRelations(String database, Class<? extends OneToManyRelation<T1, T2>> relation, T1 entity)
     {
         if (entity.getId() == null)
         {
@@ -68,7 +68,7 @@ public abstract class OneToManyRelation<T1 extends Model, T2 extends Model> exte
         }
 
         TableInfo      crossTableInfo = Cache.getTableInfo(relation);
-        Cursor         cursor         = Cache.openDatabase().rawQuery("SELECT entity2Type, entity2 FROM " + crossTableInfo.getTableName() + " WHERE entity1 = ?", new String[]{entity.getId().toString()});
+        Cursor         cursor         = Cache.openDatabase(database).rawQuery("SELECT entity2Type, entity2 FROM " + crossTableInfo.getTableName() + " WHERE entity1 = ?", new String[]{entity.getId().toString()});
         final List<T2> entities       = new ArrayList<T2>();
         try
         {
@@ -78,7 +78,7 @@ public abstract class OneToManyRelation<T1 extends Model, T2 extends Model> exte
                 {
                     String typeName = cursor.getString(0);
                     Class<? extends Model> entity2Class = (Class<? extends Model>) Class.forName(typeName);
-                    entities.add((T2) Model.load(entity2Class, cursor.getLong(1)));
+                    entities.add((T2) Model.load(database, entity2Class, cursor.getLong(1)));
                 }
                 while (cursor.moveToNext());
             }

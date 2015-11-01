@@ -1,12 +1,12 @@
 
 package com.activeandroid.test.query;
 
-import java.util.List;
-
 import com.activeandroid.sebbia.query.Delete;
 import com.activeandroid.sebbia.query.From;
 import com.activeandroid.sebbia.query.Select;
 import com.activeandroid.test.MockModel;
+
+import java.util.List;
 
 
 public class ExistsTest extends SqlableTestCase
@@ -14,7 +14,7 @@ public class ExistsTest extends SqlableTestCase
 
     private void cleanTable()
     {
-        new Delete().from(MockModel.class).execute();
+        new Delete().from(MockModel.class).execute("test");
     }
 
     private void populateTable()
@@ -27,9 +27,9 @@ public class ExistsTest extends SqlableTestCase
         m2.intField = 1;
         m3.intField = 2;
 
-        m1.save();
-        m2.save();
-        m3.save();
+        m1.save("test");
+        m2.save("test");
+        m3.save("test");
     }
 
     /**
@@ -43,8 +43,8 @@ public class ExistsTest extends SqlableTestCase
         From from = new Select()
                 .from(MockModel.class);
 
-        final List<MockModel> list   = from.execute();
-        final boolean         exists = from.exists();
+        final List<MockModel> list   = from.execute("test");
+        final boolean         exists = from.exists("test");
 
         assertTrue(exists);
         assertTrue(list.size() > 0);
@@ -110,8 +110,8 @@ public class ExistsTest extends SqlableTestCase
                 .from(MockModel.class)
                 .where("intField = ?", 1);
 
-        final List<MockModel> list   = from.execute();
-        final boolean         exists = from.exists();
+        final List<MockModel> list   = from.execute("test");
+        final boolean         exists = from.exists("test");
 
         assertTrue(exists);
         assertTrue(list.size() > 0);
@@ -130,8 +130,8 @@ public class ExistsTest extends SqlableTestCase
                 .from(MockModel.class)
                 .where("intField = ?", 3);
 
-        final List<MockModel> list   = from.execute();
-        final boolean         exists = from.exists();
+        final List<MockModel> list   = from.execute("test");
+        final boolean         exists = from.exists("test");
 
         assertFalse(exists);
         assertFalse(list.size() > 0);
@@ -150,8 +150,8 @@ public class ExistsTest extends SqlableTestCase
                 .where("intField = ?", 1)
                 .orderBy("intField ASC");
 
-        final List<MockModel> list   = from.execute();
-        final boolean         exists = from.exists();
+        final List<MockModel> list   = from.execute("test");
+        final boolean         exists = from.exists("test");
 
         assertTrue(exists);
         assertTrue(list.size() > 0);
@@ -170,8 +170,8 @@ public class ExistsTest extends SqlableTestCase
                 .groupBy("intField")
                 .having("intField = 1");
 
-        final List<MockModel> list   = from.execute();
-        final boolean         exists = from.exists();
+        final List<MockModel> list   = from.execute("test");
+        final boolean         exists = from.exists("test");
 
         assertTrue(exists);
         assertTrue(list.size() > 0);
@@ -190,8 +190,8 @@ public class ExistsTest extends SqlableTestCase
                 .groupBy("intField")
                 .having("intField = 3");
 
-        final List<MockModel> list   = from.execute();
-        final boolean         exists = from.exists();
+        final List<MockModel> list   = from.execute("test");
+        final boolean         exists = from.exists("test");
 
         assertFalse(exists);
         assertFalse(list.size() > 0);

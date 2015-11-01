@@ -1,12 +1,12 @@
 package com.activeandroid.test.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.activeandroid.sebbia.Model;
 import com.activeandroid.sebbia.annotation.Column;
 import com.activeandroid.sebbia.annotation.DoNotGenerate;
 import com.activeandroid.sebbia.query.Select;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DoNotGenerateTest extends ModelTestCase
 {
@@ -29,9 +29,9 @@ public class DoNotGenerateTest extends ModelTestCase
             impls.add(model);
         }
 
-        Model.saveMultiple(impls);
+        Model.saveMultiple("test", impls);
 
-        impls = new Select().from(DoNotGenerateModel.class).execute();
+        impls = new Select().from(DoNotGenerateModel.class).execute("test");
         assertEquals(100, impls.size());
         for (int i = 0; i < impls.size(); ++i)
         {

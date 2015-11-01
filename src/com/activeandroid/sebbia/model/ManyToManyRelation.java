@@ -1,8 +1,5 @@
 package com.activeandroid.sebbia.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.activeandroid.sebbia.Cache;
 import com.activeandroid.sebbia.Model;
 import com.activeandroid.sebbia.TableInfo;
@@ -11,6 +8,9 @@ import com.activeandroid.sebbia.annotation.DoNotGenerate;
 import com.activeandroid.sebbia.query.Delete;
 import com.activeandroid.sebbia.util.Log;
 import com.activeandroid.sebbia.util.SQLiteUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @DoNotGenerate
 public abstract class ManyToManyRelation<T1 extends Model, T2 extends Model> extends Model
@@ -21,7 +21,7 @@ public abstract class ManyToManyRelation<T1 extends Model, T2 extends Model> ext
     @Column(name = "entity2")
     private T2 entity2;
 
-    public static <T1 extends Model, T2 extends Model> void setRelationsFront(Class<? extends ManyToManyRelation<T1, T2>> relation, T1 entity1, List<T2> entities2)
+    public static <T1 extends Model, T2 extends Model> void setRelationsFront(String database, Class<? extends ManyToManyRelation<T1, T2>> relation, T1 entity1, List<T2> entities2)
     {
         if (entity1.getId() == null)
         {
@@ -35,7 +35,7 @@ public abstract class ManyToManyRelation<T1 extends Model, T2 extends Model> ext
             }
         }
 
-        new Delete().from(relation).where("entity1 = ?", entity1.getId()).execute();
+        new Delete().from(relation).where("entity1 = ?", entity1.getId()).execute(database);
         try
         {
             ArrayList<ManyToManyRelation<T1, T2>> connections = new ArrayList<ManyToManyRelation<T1, T2>>();
@@ -46,7 +46,7 @@ public abstract class ManyToManyRelation<T1 extends Model, T2 extends Model> ext
                 connection.entity2 = entity2;
                 connections.add(connection);
             }
-            saveMultiple(connections);
+            saveMultiple(database, connections);
         }
         catch (Exception e)
         {
@@ -55,7 +55,7 @@ public abstract class ManyToManyRelation<T1 extends Model, T2 extends Model> ext
         }
     }
 
-    public static <T1 extends Model, T2 extends Model> void setRelationsReverse(Class<? extends ManyToManyRelation<T1, T2>> relation, T2 entity2, List<T1> entities1)
+    public static <T1 extends Model, T2 extends Model> void setRelationsReverse(String database, Class<? extends ManyToManyRelation<T1, T2>> relation, T2 entity2, List<T1> entities1)
     {
         if (entity2.getId() == null)
         {
@@ -69,7 +69,7 @@ public abstract class ManyToManyRelation<T1 extends Model, T2 extends Model> ext
             }
         }
 
-        new Delete().from(relation).where("entity2 = ?", entity2.getId()).execute();
+        new Delete().from(relation).where("entity2 = ?", entity2.getId()).execute(database);
         try
         {
             ArrayList<ManyToManyRelation<T1, T2>> connections = new ArrayList<ManyToManyRelation<T1, T2>>();
@@ -80,7 +80,7 @@ public abstract class ManyToManyRelation<T1 extends Model, T2 extends Model> ext
                 connection.entity2 = entity2;
                 connections.add(connection);
             }
-            saveMultiple(connections);
+            saveMultiple(database, connections);
         }
         catch (Exception e)
         {
@@ -89,7 +89,7 @@ public abstract class ManyToManyRelation<T1 extends Model, T2 extends Model> ext
         }
     }
 
-    public static <T1 extends Model, T2 extends Model> List<T2> getRelationsFront(Class<? extends ManyToManyRelation<T1, T2>> relation, T1 entity)
+    public static <T1 extends Model, T2 extends Model> List<T2> getRelationsFront(String database, Class<? extends ManyToManyRelation<T1, T2>> relation, T1 entity)
     {
         if (entity.getId() == null)
         {
@@ -136,10 +136,10 @@ public abstract class ManyToManyRelation<T1 extends Model, T2 extends Model> ext
         queryBuilder.append(entity1TableInfo.getTableName());
         queryBuilder.append(".id == ?");
 
-        return SQLiteUtils.rawQuery(entity2Class, queryBuilder.toString(), new String[]{entity.getId().toString()});
+        return SQLiteUtils.rawQuery(database, entity2Class, queryBuilder.toString(), new String[]{entity.getId().toString()});
     }
 
-    public static <T1 extends Model, T2 extends Model> List<T1> getRelationsReverse(Class<? extends ManyToManyRelation<T1, T2>> relation, T2 entity)
+    public static <T1 extends Model, T2 extends Model> List<T1> getRelationsReverse(String database, Class<? extends ManyToManyRelation<T1, T2>> relation, T2 entity)
     {
         if (entity.getId() == null)
         {
@@ -186,7 +186,7 @@ public abstract class ManyToManyRelation<T1 extends Model, T2 extends Model> ext
         queryBuilder.append(entity2TableInfo.getTableName());
         queryBuilder.append(".id == ?");
 
-        return SQLiteUtils.rawQuery(entity1Class, queryBuilder.toString(), new String[]{entity.getId().toString()});
+        return SQLiteUtils.rawQuery(database, entity1Class, queryBuilder.toString(), new String[]{entity.getId().toString()});
     }
 
     public ManyToManyRelation()
