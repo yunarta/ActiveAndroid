@@ -38,7 +38,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings("unchecked")
-public abstract class Model
+public abstract class Model implements IModel
 {
 
     /**

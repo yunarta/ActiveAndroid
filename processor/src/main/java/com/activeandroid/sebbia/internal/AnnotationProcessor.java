@@ -1,5 +1,9 @@
 package com.activeandroid.sebbia.internal;
 
+import com.activeandroid.sebbia.IModel;
+import com.activeandroid.sebbia.annotation.Column;
+import com.activeandroid.sebbia.annotation.DoNotGenerate;
+
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
@@ -20,10 +24,6 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic.Kind;
 import javax.tools.JavaFileObject;
-
-import com.activeandroid.sebbia.Model;
-import com.activeandroid.sebbia.annotation.Column;
-import com.activeandroid.sebbia.annotation.DoNotGenerate;
 
 public final class AnnotationProcessor extends AbstractProcessor
 {
@@ -113,11 +113,13 @@ public final class AnnotationProcessor extends AbstractProcessor
         }
     }
 
+    public static final String SUFFIX = "$$ActiveAndroidModelFiller";
+
     private void generate(TypeElement tableElement, Set<VariableElement> columns)
     {
         String packageName     = processingEnv.getElementUtils().getPackageOf(tableElement).getQualifiedName().toString();
         String className       = tableElement.getQualifiedName().toString();
-        String fillerClassName = getClassName(tableElement, packageName) + ModelFiller.SUFFIX;
+        String fillerClassName = getClassName(tableElement, packageName) + SUFFIX;
 
         try
         {
@@ -237,7 +239,7 @@ public final class AnnotationProcessor extends AbstractProcessor
                 stringBuilder.append("      " + MODEL + "." + column.getSimpleName() + " = (" + typeMirror.toString() + ") ModelHelper.getSerializable(cursor, " + type + ", " + getColumnIndex + ");\n");
                 stringBuilder.append("    } else {\n");
                 stringBuilder.append("      " + MODEL + "." + column.getSimpleName() + " = ");
-                if (isTypeOf(typeMirror, Model.class))
+                if (isTypeOf(typeMirror, IModel.class))
                 {
                     stringBuilder.append("(" + typeMirror.toString() + ") ModelHelper.getModel(cursor, " + type + ", " + getColumnIndex + ");\n");
                 }
@@ -331,7 +333,7 @@ public final class AnnotationProcessor extends AbstractProcessor
                 stringBuilder.append(emptySpace + "  ModelHelper.setSerializable(" + CONTENT_VALUES + ", " + type + ", " + getValue + ", \"" + fieldName + "\");\n");
                 stringBuilder.append(emptySpace + "} else {\n");
                 stringBuilder.append(emptySpace + "  " + CONTENT_VALUES + ".");
-                if (isTypeOf(typeMirror, Model.class))
+                if (isTypeOf(typeMirror, IModel.class))
                 {
                     stringBuilder.append("put(\"" + fieldName + "\", " + getValue + ".getId());\n");
                 }
@@ -431,7 +433,7 @@ public final class AnnotationProcessor extends AbstractProcessor
             }
             else
             {
-                boolean isModel = isTypeOf(typeMirror, Model.class);
+                boolean isModel = isTypeOf(typeMirror, IModel.class);
                 boolean isEnum = isTypeOf(typeMirror, Enum.class);
                 if (isModel || isEnum)
                 {

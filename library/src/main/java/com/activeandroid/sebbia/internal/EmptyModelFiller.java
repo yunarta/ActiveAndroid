@@ -1,12 +1,12 @@
 package com.activeandroid.sebbia.internal;
 
-import java.util.Map;
-
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteStatement;
 
 import com.activeandroid.sebbia.Model;
+
+import java.util.Map;
 
 public class EmptyModelFiller extends ModelFiller
 {
