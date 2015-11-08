@@ -175,6 +175,7 @@ public final class AnnotationProcessor extends AbstractProcessor
     {
         StringBuilder stringBuilder = new StringBuilder();
 
+        stringBuilder.append("int index = -1;\n");
         for (VariableElement column : columns)
         {
             Column annotation = column.getAnnotation(Column.class);
@@ -188,9 +189,9 @@ public final class AnnotationProcessor extends AbstractProcessor
 
             TypeMirror typeMirror = column.asType();
             String type = getClassString(typeMirror, typeMirror instanceof DeclaredType);
-            String getColumnIndex = COLUMNS_ORDERED + ".indexOf(\"" + fieldName + "\")";
+            String getColumnIndex = "index"; // COLUMNS_ORDERED + ".indexOf(\"" + fieldName + "\")";
 
-            String setValue = "    " + MODEL + "." + column.getSimpleName() + " = " + CURSOR;
+            String setValue = "if (-1 != (index = " + COLUMNS_ORDERED + ".indexOf(\"" + fieldName + "\"))) " + MODEL + "." + column.getSimpleName() + " = " + CURSOR;
 
             if (isTypeOf(typeMirror, Integer.class) || isTypeOf(typeMirror, int.class))
             {
