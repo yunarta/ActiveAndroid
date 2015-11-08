@@ -17,6 +17,7 @@ package com.activeandroid.sebbia;
  */
 
 import android.content.Context;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
@@ -38,6 +39,7 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public final class DatabaseHelper extends SQLiteOpenHelper
 {
@@ -53,6 +55,8 @@ public final class DatabaseHelper extends SQLiteOpenHelper
 
     private final String mSqlParser;
 
+    private final String mName;
+
     //////////////////////////////////////////////////////////////////////////////////////
     // CONSTRUCTORS
     //////////////////////////////////////////////////////////////////////////////////////
@@ -60,6 +64,8 @@ public final class DatabaseHelper extends SQLiteOpenHelper
     public DatabaseHelper(Context context, String name, int version, String sqlParser)
     {
         super(context, name, null, version);
+        mName = name;
+
         copyAttachedDatabase(context, name);
         mSqlParser = sqlParser;
     }
@@ -158,6 +164,18 @@ public final class DatabaseHelper extends SQLiteOpenHelper
         {
             for (TableInfo tableInfo : Cache.getTableInfos())
             {
+                boolean createTable;
+                if (TextUtils.isEmpty(tableInfo.getDatabaseName()))
+                {
+                    createTable = true;
+                }
+                else
+                {
+                    createTable = Pattern.compile(tableInfo.getDatabaseName()).matcher(mName).matches();
+                }
+
+                if (!createTable) continue;
+
                 String[] definitions = SQLiteUtils.createIndexDefinition(tableInfo);
 
                 for (String definition : definitions)
@@ -180,7 +198,27 @@ public final class DatabaseHelper extends SQLiteOpenHelper
         {
             for (TableInfo tableInfo : Cache.getTableInfos())
             {
-                db.execSQL(SQLiteUtils.createTableDefinition(tableInfo));
+                boolean createTable;
+                if (TextUtils.isEmpty(tableInfo.getDatabaseName()))
+                {
+                    createTable = true;
+                }
+                else
+                {
+                    createTable = Pattern.compile(tableInfo.getDatabaseName()).matcher(mName).matches();
+                }
+
+                try
+                {
+                    if (createTable)
+                    {
+                        db.execSQL(SQLiteUtils.createTableDefinition(tableInfo));
+                    }
+                }
+                catch (SQLException e)
+                {
+                    throw e;
+                }
             }
             db.setTransactionSuccessful();
         }

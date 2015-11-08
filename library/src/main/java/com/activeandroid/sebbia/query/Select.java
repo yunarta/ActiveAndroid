@@ -96,6 +96,7 @@ public final class Select implements Sqlable
 
         if (mColumns != null && mColumns.length > 0)
         {
+            sql.append("Id, ");
             sql.append(TextUtils.join(", ", mColumns) + " ");
         }
         else

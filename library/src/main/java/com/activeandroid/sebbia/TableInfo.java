@@ -41,8 +41,9 @@ public final class TableInfo
     // PRIVATE MEMBERS
     //////////////////////////////////////////////////////////////////////////////////////
 
-    private Class<? extends Model> mType;
-    private String                 mTableName;
+    private       Class<? extends Model> mType;
+    private       String                 mTableName;
+    private final String                 mDatabaseName;
     private String mIdName = Table.DEFAULT_ID_NAME;
 
     private Map<Field, String> mColumnNames = new LinkedHashMap<Field, String>();
@@ -66,11 +67,13 @@ public final class TableInfo
         if (tableAnnotation != null)
         {
             mTableName = tableAnnotation.name();
+            mDatabaseName = tableAnnotation.db();
             mIdName = tableAnnotation.id();
         }
         else
         {
             mTableName = type.getSimpleName();
+            mDatabaseName = null;
         }
 
         // Manually add the id column since it is not declared like the other columns.
@@ -115,6 +118,11 @@ public final class TableInfo
     public String getTableName()
     {
         return mTableName;
+    }
+
+    public String getDatabaseName()
+    {
+        return mDatabaseName;
     }
 
     public String getIdName()

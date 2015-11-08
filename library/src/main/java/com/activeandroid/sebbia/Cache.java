@@ -215,6 +215,11 @@ public final class Cache
         return sModelInfo.getTableInfo(type).getTableName();
     }
 
+    public static synchronized String getDatabaseName(Class<? extends Model> type)
+    {
+        return sModelInfo.getTableInfo(type).getDatabaseName();
+    }
+
     static ModelFiller getFiller(Class<? extends Model> type)
     {
         return sFillers.get(type);
