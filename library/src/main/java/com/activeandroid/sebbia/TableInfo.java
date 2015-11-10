@@ -19,6 +19,7 @@ package com.activeandroid.sebbia;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.text.TextUtils;
+import android.util.SparseArray;
 
 import com.activeandroid.sebbia.annotation.Column;
 import com.activeandroid.sebbia.annotation.Table;
@@ -48,9 +49,9 @@ public final class TableInfo
 
     private Map<Field, String> mColumnNames = new LinkedHashMap<Field, String>();
 
-    private SQLiteStatement mInsertStatement;
-    private SQLiteStatement mInsertOrReplaceStatement;
-    private SQLiteStatement mUpdateStatement;
+    private SparseArray<SQLiteStatement> mInsertStatement;
+    private SparseArray<SQLiteStatement> mInsertOrReplaceStatement;
+    private SparseArray<SQLiteStatement> mUpdateStatement;
 
     private Map<String, Integer> mColumnIndexes;
 
@@ -61,6 +62,10 @@ public final class TableInfo
     public TableInfo(Class<? extends Model> type)
     {
         mType = type;
+
+        mInsertStatement = new SparseArray<>();
+        mInsertOrReplaceStatement = new SparseArray<>();
+        mUpdateStatement = new SparseArray<>();
 
         final Table tableAnnotation = type.getAnnotation(Table.class);
 
@@ -88,7 +93,7 @@ public final class TableInfo
             if (field.isAnnotationPresent(Column.class))
             {
                 final Column columnAnnotation = field.getAnnotation(Column.class);
-                String columnName = columnAnnotation.name();
+                String       columnName       = columnAnnotation.name();
                 if (TextUtils.isEmpty(columnName))
                 {
                     columnName = field.getName();
@@ -147,32 +152,47 @@ public final class TableInfo
 
     public SQLiteStatement getInsertStatement(String database)
     {
-        if (mInsertStatement == null)
+        int key = database.hashCode();
+
+        SQLiteStatement statement = mInsertStatement.get(key);
+        if (statement == null)
         {
             SQLiteDatabase db = Cache.openDatabase(database);
-            mInsertStatement = db.compileStatement(SQLiteUtils.createInsertStatement("INSERT INTO ", this));
+            statement = db.compileStatement(SQLiteUtils.createInsertStatement("INSERT INTO ", this));
+            mInsertStatement.put(key, statement);
         }
-        return mInsertStatement;
+
+        return statement;
     }
 
     public SQLiteStatement getUpdateStatement(String database)
     {
-        if (mUpdateStatement == null)
+        int key = database.hashCode();
+
+        SQLiteStatement statement = mUpdateStatement.get(key);
+        if (statement == null)
         {
             SQLiteDatabase db = Cache.openDatabase(database);
-            mUpdateStatement = db.compileStatement(SQLiteUtils.createUpdateStatement(this));
+            statement = db.compileStatement(SQLiteUtils.createUpdateStatement(this));
+            mUpdateStatement.put(key, statement);
         }
-        return mUpdateStatement;
+
+        return statement;
     }
 
     public SQLiteStatement getInsertOrReplaceStatement(String database)
     {
-        if (mInsertOrReplaceStatement == null)
+        int key = database.hashCode();
+
+        SQLiteStatement statement = mInsertOrReplaceStatement.get(key);
+        if (statement == null)
         {
             SQLiteDatabase db = Cache.openDatabase(database);
-            mInsertOrReplaceStatement = db.compileStatement(SQLiteUtils.createInsertStatement("INSERT OR REPLACE INTO ", this));
+            statement = db.compileStatement(SQLiteUtils.createInsertStatement("INSERT OR REPLACE INTO ", this));
+            mInsertOrReplaceStatement.put(key, statement);
         }
-        return mInsertOrReplaceStatement;
+
+        return statement;
     }
 
     private Field getIdField(Class<?> type)
