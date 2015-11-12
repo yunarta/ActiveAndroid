@@ -1,0 +1,8 @@
+include ':active-android'
+project(':active-android').projectDir = new File('library')
+
+include ':active-android-annotations'
+project(':active-android-annotations').projectDir = new File('annotations')
+
+include ':active-android-processor'
+project(':active-android-processor').projectDir = new File('processor')

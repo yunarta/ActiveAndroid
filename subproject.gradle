@@ -1,0 +1,6 @@
+apply from: 'subsettings.gradle'
+
+rootProject.children.each { project ->
+    String projectPath = project.projectDir.path.replace(settingsDir.path, "")
+    project.projectDir = new File(settings.ext.root + "/active-android/$projectPath")
+}
