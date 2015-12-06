@@ -16,6 +16,9 @@ package com.activeandroid.sebbia.util;
  * limitations under the License.
  */
 
+/**
+ * @hide
+ */
 public final class Log
 {
     //////////////////////////////////////////////////////////////////////////////////////

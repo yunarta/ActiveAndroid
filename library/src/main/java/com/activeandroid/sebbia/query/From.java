@@ -16,6 +16,7 @@ package com.activeandroid.sebbia.query;
  * limitations under the License.
  */
 
+import android.database.Cursor;
 import android.text.TextUtils;
 
 import com.activeandroid.sebbia.Cache;
@@ -338,6 +339,17 @@ public final class From implements Sqlable
         addOffset(sql);
 
         return sqlString(sql);
+    }
+
+    public Cursor query(String database)
+    {
+        if (mQueryBase instanceof Select)
+        {
+            Cursor cursor = Cache.openDatabase(database).rawQuery(toSql(), getArguments());
+            return cursor;
+        }
+
+        return null;
     }
 
     public <T extends Model> List<T> execute(String database)

@@ -3,8 +3,12 @@ apply plugin: 'com.android.library'
 apply from: ('https://raw.githubusercontent.com/yunarta/works-gradle-script/master/auto-configure.gradle')
 
 android {
+    dataBinding {
+        enabled = true
+    }
+
     compileSdkVersion autoCompileSdkVersion(23)
-    buildToolsVersion autoBuildToolsVersion('23.0.1')
+    buildToolsVersion '23.0.2'
 
     defaultPublishConfig "debug"
 
