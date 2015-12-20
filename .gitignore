@@ -37,3 +37,4 @@ tmp
 .gradle
 /build
 /out
+publish.properties

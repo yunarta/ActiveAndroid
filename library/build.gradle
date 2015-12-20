@@ -48,3 +48,20 @@ dependencies {
     compile project(':active-android-annotations')
     compile 'com.android.support:support-v4:' + autoConfig.support('23.1.1')
 }
+
+worksPublish {
+    bintray {
+        repo = 'maven'
+        name = group + ':ActiveAndroid'
+    }
+
+    developer {
+        id = 'yunarta'
+        name = 'Yunarta Kartawahyudi'
+        email = 'yunarta.kartawahyudi@gmail.com'
+    }
+
+    siteUrl = 'https://github.com/yunarta/ActiveAndroid'
+    gitUrl = 'https://github.com/yunarta/ActiveAndroid.git'
+
+}
