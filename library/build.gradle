@@ -1,0 +1,46 @@
+apply plugin: 'com.android.library'
+
+apply from: ('https://raw.githubusercontent.com/yunarta/works-gradle-script/master/auto-configure.gradle')
+
+android {
+    dataBinding {
+        enabled = true
+    }
+
+    compileSdkVersion autoCompileSdkVersion(23)
+    buildToolsVersion '23.0.2'
+
+    defaultPublishConfig "debug"
+
+    defaultConfig {
+        testApplicationId "com.activeandroid.test"
+
+        minSdkVersion 16
+        targetSdkVersion autoCompileSdkVersion(22)
+
+        versionCode 1
+        versionName version
+    }
+
+    buildTypes {
+        debug {
+
+        }
+
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile project(':active-android-annotations')
+    compile 'com.android.support:support-v4:23.1.1'
+}
