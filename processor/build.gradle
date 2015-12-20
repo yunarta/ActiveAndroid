@@ -1,16 +1,31 @@
 apply plugin: 'java'
+apply plugin: 'com.mobilesolutionworks.jenkins-configure'
+apply plugin: 'com.mobilesolutionworks.bintray-publish'
+
+group 'com.mobilesolutionworks'
+version jenkins.version('4.0.0')
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
-
-sourceSets {
-	main {
-		java.srcDirs = ['src/main/java']
-	}
+dependencies {
+    compile fileTree(dir: 'libs', include: '*.jar')
+    compile project(':active-android-annotations')
 }
 
-dependencies {
-	compile fileTree(dir: 'libs', include: '*.jar')
-	compile project(':active-android-annotations')
+worksPublish {
+    bintray {
+        repo = 'maven'
+        name = group + ':ActiveAndroid'
+    }
+
+    developer {
+        id = 'yunarta'
+        name = 'Yunarta Kartawahyudi'
+        email = 'yunarta.kartawahyudi@gmail.com'
+    }
+
+    siteUrl = 'https://github.com/yunarta/ActiveAndroid'
+    gitUrl = 'https://github.com/yunarta/ActiveAndroid.git'
+
 }
