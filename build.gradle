@@ -1,17 +1,25 @@
-apply plugin: 'java'
-apply from: 'gradle-mvn-push.gradle'
-
-targetCompatibility = '1.6'
-sourceCompatibility = '1.6'
-
-sourceSets {
-	main {
-		java {
-			srcDir 'src'
+buildscript {
+	repositories {
+		jcenter()
+		maven {
+			url 'http://dl.bintray.com/yunarta-kartawahyudi/maven'
 		}
+		maven {
+			url 'http://dl.bintray.com/yunarta-kartawahyudi/snapshot'
+		}
+	}
+
+	dependencies {
+		classpath "com.android.tools.build:gradle:2.0.0-alpha2"
+		classpath 'com.mobilesolutionworks:works-bintray-publish:1.0.0'
+		classpath 'com.mobilesolutionworks:works-jenkins-android-builder:1.0.0'
+		classpath 'com.mobilesolutionworks:works-autoconfig:1.0.0'
 	}
 }
 
-dependencies {
-	compile fileTree(dir: 'libs', include: '*.jar')
+allprojects {
+	repositories {
+		jcenter()
+	}
 }
+

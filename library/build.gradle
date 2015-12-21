@@ -1,0 +1,67 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.mobilesolutionworks.android-autoconfig'
+apply plugin: 'com.mobilesolutionworks.jenkins-configure'
+apply plugin: 'com.mobilesolutionworks.bintray-publish'
+
+group 'com.mobilesolutionworks'
+version jenkins.version("4.0.0")
+
+android {
+    dataBinding {
+        enabled = true
+    }
+
+    compileSdkVersion autoConfig.sdk(23)
+    buildToolsVersion autoConfig.buildTools('23.0.2')
+
+    defaultPublishConfig "debug"
+
+    defaultConfig {
+        testApplicationId "com.activeandroid.test"
+
+        minSdkVersion 14
+        targetSdkVersion autoConfig.sdk(23)
+
+        versionCode jenkins.build(1)
+        versionName version
+    }
+
+    buildTypes {
+        debug {
+
+        }
+
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile project(':active-android-annotations')
+    compile 'com.android.support:support-v4:' + autoConfig.support('23.1.1')
+}
+
+worksPublish {
+    bintray {
+        repo = 'maven'
+        name = group + ':ActiveAndroid'
+    }
+
+    developer {
+        id = 'yunarta'
+        name = 'Yunarta Kartawahyudi'
+        email = 'yunarta.kartawahyudi@gmail.com'
+    }
+
+    siteUrl = 'https://github.com/yunarta/ActiveAndroid'
+    gitUrl = 'https://github.com/yunarta/ActiveAndroid.git'
+
+}
