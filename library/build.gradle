@@ -7,10 +7,6 @@ group 'com.mobilesolutionworks'
 version jenkins.version("4.0.0")
 
 android {
-    dataBinding {
-        enabled = true
-    }
-
     compileSdkVersion autoConfig.sdk(23)
     buildToolsVersion autoConfig.buildTools('23.0.2')
 
