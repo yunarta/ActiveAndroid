@@ -48,7 +48,7 @@ public final class Cache
 
     private static ModelInfo sModelInfo;
 
-    private static SparseArray<DatabaseHelper> sDatabaseHelper;
+    private static SparseArray<DatabaseHelper> sDatabaseHelper = new SparseArray<>();;
 
     private static LruCache<String, Model> sEntities;
 
@@ -84,7 +84,7 @@ public final class Cache
         sVersion = configuration.getDatabaseVersion();
         sSqlParser = configuration.getSqlParser();
 
-        sDatabaseHelper = new SparseArray<DatabaseHelper>();
+        sDatabaseHelper = new SparseArray<>();
         // sDatabaseHelper = new DatabaseHelper(configuration.getContext(), configuration.getDatabaseName(), sVersion, sSqlParser);
 
         // TODO: It would be nice to override sizeOf here and calculate the memory
