@@ -69,6 +69,11 @@ public abstract class Model implements IModel
     // PUBLIC METHODS
     // ////////////////////////////////////////////////////////////////////////////////////
 
+    public final void clearId()
+    {
+        mId = null;
+    }
+
     public final Long getId()
     {
         return mId;
