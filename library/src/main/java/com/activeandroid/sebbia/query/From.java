@@ -345,7 +345,7 @@ public final class From implements Sqlable
     {
         if (mQueryBase instanceof Select)
         {
-            Cursor cursor = Cache.openDatabase(database).rawQuery(toSql(), getArguments());
+                Cursor cursor = Cache.openDatabase(database).rawQuery(toSql(), getArguments());
             return cursor;
         }
 

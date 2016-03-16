@@ -16,7 +16,7 @@ dependencies {
 worksPublish {
     bintray {
         repo = 'maven'
-        name = group + ':ActiveAndroid'
+        name = group + ':ActiveAndroidProcessor'
     }
 
     developer {

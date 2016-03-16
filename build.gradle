@@ -10,7 +10,7 @@ buildscript {
 	}
 
 	dependencies {
-		classpath "com.android.tools.build:gradle:2.0.0-alpha2"
+		classpath 'com.android.tools.build:gradle:2.1.0-alpha1'
 		classpath 'com.mobilesolutionworks:works-bintray-publish:1.0.0'
 		classpath 'com.mobilesolutionworks:works-jenkins-android-builder:1.0.0'
 		classpath 'com.mobilesolutionworks:works-autoconfig:1.0.0'

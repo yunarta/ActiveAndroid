@@ -262,15 +262,27 @@ public class Configuration
             // Get model classes from meta-data
             if (mModelClasses != null)
             {
-                configuration.mModelClasses = mModelClasses;
+                configuration.mModelClasses = new ArrayList<>(mModelClasses);
             }
             else
             {
                 final String modelList = ReflectionUtils.getMetaData(mContext, AA_MODELS);
                 if (modelList != null)
                 {
-                    configuration.mModelClasses = loadModelList(modelList.split(","));
+                    configuration.mModelClasses = new ArrayList<>(loadModelList(modelList.split(",")));
                 }
+            }
+
+
+            try {
+                Class<? extends ModelLoader> modelLoaderClass = (Class<? extends ModelLoader>) Class.forName("com.activeandroid.sebbia.ModelLoaderImpl");
+                ModelLoader modelLoader = modelLoaderClass.newInstance();
+                String[] models = modelLoader.getModels();
+
+                if (configuration.mModelClasses == null) configuration.mModelClasses = new ArrayList<>();
+                configuration.mModelClasses.addAll(loadModelList(models));
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
             // Get type serializer classes from meta-data
